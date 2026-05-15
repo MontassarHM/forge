@@ -27,7 +27,7 @@ function Sidebar() {
     <>
       <aside className="sidebar">
         <div className="logo">
-          <h2>⚡ OnboardAI</h2>
+          <h2>⚡ FORGE</h2>
           <p>LEARN BY DOING</p>
         </div>
 
