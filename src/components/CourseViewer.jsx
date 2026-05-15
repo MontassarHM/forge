@@ -5,11 +5,11 @@ import ChapterSidebar from './ChapterSidebar';
 import QCMQuestion from './QCMQuestion';
 import CodeEditor from './CodeEditor';
 import ShortAnswerQuestion from './ShortAnswerQuestion';
-import { 
-  getCourseById, 
-  getCourseProgress, 
-  saveProgress, 
-  recordActivity, 
+import {
+  getCourseById,
+  getCourseProgress,
+  saveProgress,
+  recordActivity,
   deleteCourse,
   updateChapter
 } from '../services/statsService';
@@ -20,7 +20,7 @@ function CourseViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { refreshStats, refreshCourses } = useApp();
-  
+
   // ✅ TOUS les hooks au début, AVANT toute condition de retour
   const [course, setCourse] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(0);
@@ -47,7 +47,7 @@ function CourseViewer() {
   // Auto-génération du chapitre actuel
   useEffect(() => {
     if (!course) return;
-    
+
     const chapter = course.chapters[currentChapter];
     if (chapter && !chapter.isGenerated && !generatingChapter) {
       generateCurrentChapter();
@@ -58,7 +58,7 @@ function CourseViewer() {
   // Préchargement du chapitre suivant
   useEffect(() => {
     if (!course) return;
-    
+
     const chapter = course.chapters[currentChapter];
     if (chapter?.isGenerated && !generatingChapter) {
       const timer = setTimeout(() => {
@@ -81,10 +81,10 @@ function CourseViewer() {
   }, [startTime, refreshStats]);
 
   // ===== Fonctions =====
-  
+
   const generateCurrentChapter = async () => {
     if (!course) return;
-    
+
     const chapter = course.chapters[currentChapter];
     if (chapter.isGenerated) return;
 
@@ -92,11 +92,11 @@ function CourseViewer() {
     try {
       console.log('🤖 Génération du chapitre', currentChapter + 1);
       const generatedChapter = await generateChapterContent(course, currentChapter);
-      
+
       const updatedCourse = { ...course };
       updatedCourse.chapters[currentChapter] = generatedChapter;
       setCourse(updatedCourse);
-      
+
       updateChapter(course.id, currentChapter, generatedChapter);
     } catch (error) {
       console.error('Erreur génération:', error);
@@ -108,7 +108,7 @@ function CourseViewer() {
 
   const preloadNextChapter = async () => {
     if (!course) return;
-    
+
     const nextIdx = currentChapter + 1;
     if (nextIdx < course.chapters.length && !course.chapters[nextIdx].isGenerated) {
       try {
@@ -134,9 +134,9 @@ function CourseViewer() {
 
   const handleQuestionAnswered = (questionId, correct, questionType) => {
     const key = `ch${currentChapter}_${questionId}`;
-    const newAnswered = { 
-      ...progress.answeredQuestions, 
-      [key]: { correct, answeredAt: new Date().toISOString() } 
+    const newAnswered = {
+      ...progress.answeredQuestions,
+      [key]: { correct, answeredAt: new Date().toISOString() }
     };
     const newProgress = { ...progress, answeredQuestions: newAnswered };
     setProgress(newProgress);
@@ -149,12 +149,12 @@ function CourseViewer() {
     if (!progress.completedChapters.includes(currentChapter)) {
       const newCompleted = [...progress.completedChapters, currentChapter];
       const newProgress = { ...progress, completedChapters: newCompleted };
-      
+
       if (newCompleted.length === course.chapters.length) {
         newProgress.completedAt = new Date().toISOString();
         recordActivity('course_completed');
       }
-      
+
       setProgress(newProgress);
       saveProgress(id, newProgress);
       refreshStats();
@@ -201,17 +201,17 @@ function CourseViewer() {
                 </span>
               )}
               {!isChapterGenerated && !generatingChapter && (
-                <span className="completed-badge" style={{ 
-                  background: 'var(--accent-dim)', 
-                  color: 'var(--accent)', 
-                  borderColor: 'var(--accent)' 
+                <span className="completed-badge" style={{
+                  background: 'var(--accent-dim)',
+                  color: 'var(--accent)',
+                  borderColor: 'var(--accent)'
                 }}>
                   <Sparkles size={16} /> Pas encore généré
                 </span>
               )}
             </div>
-            <button 
-              className="btn-delete-large" 
+            <button
+              className="btn-delete-large"
               onClick={() => setDeleteConfirm(true)}
               title="Supprimer ce cours"
             >
@@ -244,40 +244,40 @@ function CourseViewer() {
               </div>
             )}
 
-<div className="chapter-text">
-  {(typeof chapter?.content === 'string'
-    ? chapter.content
-    : ''
-  )
-    .split('\n\n')
-    .filter(p => p.trim() !== '')
-    .map((p, idx) => {
+            <div className="chapter-text">
+              {(typeof chapter?.content === 'string'
+                ? chapter.content
+                : ''
+              )
+                .split('\n\n')
+                .filter(p => p.trim() !== '')
+                .map((p, idx) => {
 
-      if (p.startsWith('## ')) {
-        return (
-          <h3
-            key={idx}
-            className="chapter-subtitle"
-          >
-            {p.replace('## ', '')}
-          </h3>
-        );
-      }
+                  if (p.startsWith('## ')) {
+                    return (
+                      <h3
+                        key={idx}
+                        className="chapter-subtitle"
+                      >
+                        {p.replace('## ', '')}
+                      </h3>
+                    );
+                  }
 
-      if (p.startsWith('### ')) {
-        return (
-          <h4
-            key={idx}
-            className="chapter-subtitle-small"
-          >
-            {p.replace('### ', '')}
-          </h4>
-        );
-      }
+                  if (p.startsWith('### ')) {
+                    return (
+                      <h4
+                        key={idx}
+                        className="chapter-subtitle-small"
+                      >
+                        {p.replace('### ', '')}
+                      </h4>
+                    );
+                  }
 
-      return <p key={idx}>{p}</p>;
-    })}
-</div>
+                  return <p key={idx}>{p}</p>;
+                })}
+            </div>
 
             {chapter.examples && chapter.examples.length > 0 && (
               <div className="examples-section">
@@ -303,77 +303,77 @@ function CourseViewer() {
           <div className="questions-section">
             <h3>🧠 Check Knowledge - {chapter.title}</h3>
             <p className="questions-intro">Répondez aux questions pour valider vos connaissances</p>
-            
+
             {chapter.questions?.map((q, idx) => (
 
-  <div key={q.id || idx} className="question-block">
+              <div key={q.id || idx} className="question-block">
 
-    <div className="question-number">
-      Question {idx + 1}/{chapter.questions.length}
-    </div>
+                <div className="question-number">
+                  Question {idx + 1}/{chapter.questions.length}
+                </div>
 
-    {/* MCQ */}
-    {q.type === 'mcq' && (
-      <QCMQuestion
-        question={q}
-        onAnswered={(correct) =>
-          handleQuestionAnswered(
-            q.id || `q${idx}`,
-            correct,
-            'mcq'
-          )
-        }
-      />
-    )}
+                {/* MCQ */}
+                {q.type === 'mcq' && (
+                  <QCMQuestion
+                    question={q}
+                    onAnswered={(correct) =>
+                      handleQuestionAnswered(
+                        q.id || `q${idx}`,
+                        correct,
+                        'mcq'
+                      )
+                    }
+                  />
+                )}
 
-    {/* TRUE FALSE */}
-    {q.type === 'true_false' && (
-      <QCMQuestion
-        question={{
-          ...q,
-          options: ['True', 'False']
-        }}
-        onAnswered={(correct) =>
-          handleQuestionAnswered(
-            q.id || `q${idx}`,
-            correct,
-            'true_false'
-          )
-        }
-      />
-    )}
+                {/* TRUE FALSE */}
+                {q.type === 'true_false' && (
+                  <QCMQuestion
+                    question={{
+                      ...q,
+                      options: ['True', 'False']
+                    }}
+                    onAnswered={(correct) =>
+                      handleQuestionAnswered(
+                        q.id || `q${idx}`,
+                        correct,
+                        'true_false'
+                      )
+                    }
+                  />
+                )}
 
-    {/* CODING */}
-    {q.type === 'coding' && (
-      <CodeEditor
-        question={q}
-        onAnswered={(correct) =>
-          handleQuestionAnswered(
-            q.id || `q${idx}`,
-            correct,
-            'coding'
-          )
-        }
-      />
-    )}
+                {/* CODING */}
+                {q.type === 'coding' && (
+                  <CodeEditor
+                    question={q}
+                    onAnswered={(correct) =>
+                      handleQuestionAnswered(
+                        q.id || `q${idx}`,
+                        correct,
+                        'coding'
+                      )
+                    }
+                  />
+                )}
 
-    {/* SHORT ANSWER */}
-    {q.type === 'short_answer' && (
-      <ShortAnswerQuestion
-        question={q}
-        onAnswered={(correct) =>
-          handleQuestionAnswered(
-            q.id || `q${idx}`,
-            correct,
-            'short_answer'
-          )
-        }
-      />
-    )}
+                {/* SHORT ANSWER */}
+                {q.type === 'short_answer' && (
+                  <ShortAnswerQuestion
+                    question={q}
+                    onAnswered={(correct) =>
+                      handleQuestionAnswered(
+                        q.id || `q${idx}`,
+                        correct,
+                        'short_answer'
+                      )
+                    }
+                  />
+                )}
 
-  </div>
+              </div>
 
-))}
+            ))}
 
             <div className="chapter-actions">
               <button className="btn-secondary" onClick={() => setShowQuestions(false)}>
@@ -389,8 +389,8 @@ function CourseViewer() {
         )}
 
         <div className="navigation">
-          <button 
-            onClick={() => handleSelectChapter(currentChapter - 1)} 
+          <button
+            onClick={() => handleSelectChapter(currentChapter - 1)}
             disabled={currentChapter === 0}
           >
             <ChevronLeft /> Précédent
@@ -398,8 +398,8 @@ function CourseViewer() {
           <span className="page-indicator">
             {currentChapter + 1} / {course.chapters.length}
           </span>
-          <button 
-            onClick={() => handleSelectChapter(currentChapter + 1)} 
+          <button
+            onClick={() => handleSelectChapter(currentChapter + 1)}
             disabled={currentChapter === course.chapters.length - 1}
           >
             Suivant <ChevronRight />

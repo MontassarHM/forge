@@ -1,50 +1,55 @@
-const BACKEND_URL = 'http://localhost:5000';
- 
+const BACKEND_URL = "http://localhost:5000";
+
 // ✅ Rate limiter SIMPLE et FIABLE
 let lastRequestTime = 0;
 const MIN_DELAY_BETWEEN_REQUESTS = 2500; // 2.5 secondes entre chaque requête
- 
+
 const waitForRateLimit = async () => {
   const now = Date.now();
   const elapsed = now - lastRequestTime;
   if (elapsed < MIN_DELAY_BETWEEN_REQUESTS) {
     const waitTime = MIN_DELAY_BETWEEN_REQUESTS - elapsed;
     console.log(`⏳ Attente ${(waitTime / 1000).toFixed(1)}s...`);
-    await new Promise(r => setTimeout(r, waitTime));
+    await new Promise((r) => setTimeout(r, waitTime));
   }
   lastRequestTime = Date.now();
 };
- 
+
 /**
-* 📞 Appel à l'IA avec retry
-*/
-const callAI = async (messages, jsonMode = true, maxTokens = 4000, retries = 3) => {
+ * 📞 Appel à l'IA avec retry
+ */
+const callAI = async (
+  messages,
+  jsonMode = true,
+  maxTokens = 4000,
+  retries = 3,
+) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await waitForRateLimit();
- 
+
       console.log(`📤 Appel IA (essai ${attempt}/${retries})...`);
- 
+
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant', // ⚡ Modèle rapide avec plus de tokens
+          model: "llama-3.1-8b-instant", // ⚡ Modèle rapide avec plus de tokens
           messages,
-          ...(jsonMode && { response_format: { type: 'json_object' } }),
+          ...(jsonMode && { response_format: { type: "json_object" } }),
           temperature: 0.7,
           max_tokens: maxTokens,
         }),
       });
- 
+
       const responseText = await response.text();
- 
+
       // ✅ Si rate limit, attendre intelligemment
       if (response.status === 429) {
         let waitTime = 30000; // 30s par défaut
         try {
           const errorData = JSON.parse(responseText);
-          const msg = errorData?.error?.message || '';
+          const msg = errorData?.error?.message || "";
           // Extraire le délai du message ex: "try again in 12.5s"
           const match = msg.match(/(\d+(?:\.\d+)?)s/);
           if (match) {
@@ -53,54 +58,60 @@ const callAI = async (messages, jsonMode = true, maxTokens = 4000, retries = 3) 
         } catch (e) {}
         // Limiter l'attente max à 60s
         waitTime = Math.min(waitTime, 60000);
-        console.log(`⚠️ Rate limit. Attente ${(waitTime / 1000).toFixed(0)}s (essai ${attempt}/${retries})`);
+        console.log(
+          `⚠️ Rate limit. Attente ${(waitTime / 1000).toFixed(0)}s (essai ${attempt}/${retries})`,
+        );
         if (attempt === retries) {
-          throw new Error(`Rate limit Groq atteint. Attendez 1 minute et réessayez.`);
+          throw new Error(
+            `Rate limit Groq atteint. Attendez 1 minute et réessayez.`,
+          );
         }
-        await new Promise(r => setTimeout(r, waitTime));
+        await new Promise((r) => setTimeout(r, waitTime));
         continue;
       }
- 
+
       // ✅ Parser la réponse
       let data;
       try {
         data = JSON.parse(responseText);
       } catch (e) {
-        console.error('❌ Réponse non-JSON:', responseText.substring(0, 200));
-        throw new Error(`Réponse invalide du serveur (status ${response.status})`);
+        console.error("❌ Réponse non-JSON:", responseText.substring(0, 200));
+        throw new Error(
+          `Réponse invalide du serveur (status ${response.status})`,
+        );
       }
- 
+
       if (!response.ok) {
         const errorMsg = data?.error?.message || JSON.stringify(data);
         throw new Error(`API Error (${response.status}): ${errorMsg}`);
       }
- 
+
       const content = data?.choices?.[0]?.message?.content;
       if (!content) {
-        throw new Error('Réponse vide de l\'IA');
+        throw new Error("Réponse vide de l'IA");
       }
- 
-      console.log('✅ Réponse OK');
+
+      console.log("✅ Réponse OK");
       return content;
     } catch (error) {
       console.error(`❌ Essai ${attempt}:`, error.message);
       if (attempt === retries) throw error;
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise((r) => setTimeout(r, 3000));
     }
   }
 };
- 
+
 /**
-* ✂️ Découpe le document
-*/
+ * ✂️ Découpe le document
+ */
 const chunkDocument = (content, chunkSize = 8000) => {
   const chunks = [];
   let start = 0;
   while (start < content.length) {
     let end = start + chunkSize;
     if (end < content.length) {
-      const lastNewline = content.lastIndexOf('\n', end);
-      const lastDot = content.lastIndexOf('.', end);
+      const lastNewline = content.lastIndexOf("\n", end);
+      const lastDot = content.lastIndexOf(".", end);
       const cutPoint = Math.max(lastNewline, lastDot);
       if (cutPoint > start + chunkSize / 2) {
         end = cutPoint + 1;
@@ -111,15 +122,15 @@ const chunkDocument = (content, chunkSize = 8000) => {
   }
   return chunks;
 };
- 
+
 /**
-* 🧠 Analyse en UNE SEULE requête
-*/
+ * 🧠 Analyse en UNE SEULE requête
+ */
 const analyzeDocument = async (content) => {
-  console.log('📊 Analyse globale du document...');
+  console.log("📊 Analyse globale du document...");
   // Tronquer si trop long
   const truncated = content.substring(0, 12000);
-const prompt = `Analyze this document and extract the main topics.
+  const prompt = `Analyze this document and extract the main topics.
 
 DOCUMENT:
 ${truncated}
@@ -131,27 +142,40 @@ Respond in JSON:
   "keyTerms": ["term 1", "term 2", "term 3"],
   "summary": "Global summary of the document in 200 words"
 }`;
- 
+
   try {
-    const result = await callAI([
-      { role: 'system', content: 'Tu analyses des documents et réponds en JSON valide.' },
-      { role: 'user', content: prompt }
-    ], true, 1500);
+    const result = await callAI(
+      [
+        {
+          role: "system",
+          content: "Tu analyses des documents et réponds en JSON valide.",
+        },
+        { role: "user", content: prompt },
+      ],
+      true,
+      1500,
+    );
     return JSON.parse(result);
   } catch (error) {
-    console.error('❌ Erreur analyse:', error);
+    console.error("❌ Erreur analyse:", error);
     return {
-      mainTopic: 'Document analysé',
-      subTopics: ['Introduction', 'Concepts clés', 'Applications', 'Cas pratiques', 'Conclusion'],
+      mainTopic: "Document analysé",
+      subTopics: [
+        "Introduction",
+        "Concepts clés",
+        "Applications",
+        "Cas pratiques",
+        "Conclusion",
+      ],
       keyTerms: [],
-      summary: truncated.substring(0, 500)
+      summary: truncated.substring(0, 500),
     };
   }
 };
- 
+
 /**
-* 📚 Génère le PLAN du cours (1 seule requête)
-*/
+ * 📚 Génère le PLAN du cours (1 seule requête)
+ */
 /**
  * 🔍 Détecte automatiquement les sections/titres du document
  */
@@ -159,20 +183,18 @@ const detectDocumentSections = (content) => {
   const lines = content.split("\n");
 
   const sections = lines
-    .map(line => line.trim())
-    .filter(line => {
+    .map((line) => line.trim())
+    .filter((line) => {
       return (
         line.length > 5 &&
         line.length < 120 &&
-        (
-          /^[0-9]+\./.test(line) || // 1. Introduction
+        (/^[0-9]+\./.test(line) || // 1. Introduction
           /^[0-9]+\s+-/.test(line) || // 1 - Intro
           /^chapter/i.test(line) ||
           /^chapitre/i.test(line) ||
           /^section/i.test(line) ||
           /^#+\s/.test(line) || // Markdown #
-          /^[A-Z\s]{5,}$/.test(line) // TITRE MAJUSCULE
-        )
+          /^[A-Z\s]{5,}$/.test(line)) // TITRE MAJUSCULE
       );
     });
 
@@ -186,13 +208,12 @@ export const generateCoursePlan = async ({
   content,
   duration,
   difficulty,
-  language = 'English',
-  specification
-
+  language = "English",
+  specification,
 }) => {
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🚀 GÉNÉRATION PLAN COURS');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🚀 GÉNÉRATION PLAN COURS");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   try {
     const specText = specification?.trim();
@@ -200,7 +221,7 @@ export const generateCoursePlan = async ({
     // ✅ Analyse globale
     const analysis = await analyzeDocument(content);
 
-    console.log('✅ Analyse terminée');
+    console.log("✅ Analyse terminée");
 
     // ✅ Découpage document
     const chunks = chunkDocument(content, 12000);
@@ -210,23 +231,20 @@ export const generateCoursePlan = async ({
     // ✅ Détection sections réelles
     const detectedSections = detectDocumentSections(content);
 
-    console.log('📚 Sections détectées:', detectedSections);
+    console.log("📚 Sections détectées:", detectedSections);
 
     // ✅ Nombre dynamique de chapitres
-const estimatedChapters = Math.max(
-  detectedSections.length,
-  1
-);
+    const estimatedChapters = Math.max(detectedSections.length, 1);
 
-    console.log('📘 Nombre chapitres estimé:', estimatedChapters);
+    console.log("📘 Nombre chapitres estimé:", estimatedChapters);
 
     // ✅ Prompt amélioré
-   const prompt = `
+    const prompt = `
 You are a senior instructional design expert.
 
 Analyze this document and create a structured course.
 
-${specText ? `⚠️ User specifications to consider:\n${specText}\n\n` : ''}
+${specText ? `⚠️ User specifications to consider:\n${specText}\n\n` : ""}
 
 ━━━━━━━━━━━━━━━
 📌 DOCUMENT ANALYSIS
@@ -236,10 +254,10 @@ MAIN TOPIC:
 ${analysis.mainTopic}
 
 SUBTOPICS:
-${analysis.subTopics.join(', ')}
+${analysis.subTopics.join(", ")}
 
 KEY TERMS:
-${analysis.keyTerms.join(', ')}
+${analysis.keyTerms.join(", ")}
 
 SUMMARY:
 ${analysis.summary}
@@ -248,7 +266,7 @@ ${analysis.summary}
 📚 DETECTED SECTIONS
 ━━━━━━━━━━━━━━━
 
-${detectedSections.join('\n')}
+${detectedSections.join("\n")}
 
 ━━━━━━━━━━━━━━━
 ⚙ PARAMETERS
@@ -306,17 +324,21 @@ IMPORTANT:
 `;
 
     // ✅ Appel IA
-    const result = await callAI([
-      {
-        role: 'system',
-        content:
-          'Tu génères des plans de cours pédagogiques très structurés en JSON valide.'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ], true, 3000);
+    const result = await callAI(
+      [
+        {
+          role: "system",
+          content:
+            "Tu génères des plans de cours pédagogiques très structurés en JSON valide.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      true,
+      3000,
+    );
 
     // ✅ Parsing sécurisé
     let plan;
@@ -324,14 +346,14 @@ IMPORTANT:
     try {
       plan = JSON.parse(result);
     } catch (e) {
-      console.error('❌ JSON invalide:', result);
+      console.error("❌ JSON invalide:", result);
 
-      throw new Error('Réponse JSON invalide');
+      throw new Error("Réponse JSON invalide");
     }
 
     // ✅ Validation
     if (!plan.chapters || !Array.isArray(plan.chapters)) {
-      throw new Error('Structure du plan invalide');
+      throw new Error("Structure du plan invalide");
     }
 
     // ✅ Enrichissement
@@ -343,7 +365,7 @@ IMPORTANT:
       difficulty,
       language,
       totalContentLength: content.length,
-      detectedSections
+      detectedSections,
     };
 
     // ✅ Initialisation chapitres
@@ -353,62 +375,62 @@ IMPORTANT:
       content: null,
       keyPoints: null,
       questions: null,
-      isGenerated: false
+      isGenerated: false,
     }));
 
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log(`✅ PLAN GÉNÉRÉ (${plan.chapters.length} chapitres)`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     return plan;
-
   } catch (error) {
+    console.error("❌ ERREUR generateCoursePlan:", error);
 
-    console.error('❌ ERREUR generateCoursePlan:', error);
-
-    throw new Error(
-      error?.message || 'Erreur génération plan'
-    );
+    throw new Error(error?.message || "Erreur génération plan");
   }
 };
- 
+
 /**
-* 📖 Génère UN chapitre
-*/
+ * 📖 Génère UN chapitre
+ */
 export const generateChapterContent = async (course, chapterIndex) => {
   const chapter = course.chapters[chapterIndex];
   if (chapter.isGenerated) {
-    console.log('📦 Chapitre déjà généré');
+    console.log("📦 Chapitre déjà généré");
     return chapter;
   }
   console.log(`📝 Génération chapitre ${chapterIndex + 1}: ${chapter.title}`);
   // Trouver les chunks pertinents pour ce chapitre
-  const chapterTopics = [...(chapter.topics || []), ...(chapter.concepts || [])].join(' ').toLowerCase();
+  const chapterTopics = [...(chapter.topics || []), ...(chapter.concepts || [])]
+    .join(" ")
+    .toLowerCase();
   // Sélectionner les 2 chunks les plus pertinents
   const relevantChunks = course.chunks
     .map((chunk, idx) => {
       const chunkLower = chunk.toLowerCase();
       let score = 0;
-      chapterTopics.split(' ').forEach(word => {
+      chapterTopics.split(" ").forEach((word) => {
         if (word.length > 3 && chunkLower.includes(word)) score++;
       });
       return { chunk, idx, score };
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, 2)
-    .map(c => c.chunk);
+    .map((c) => c.chunk);
   // Si aucun chunk trouvé, prendre les 2 premiers
-  const sourceContent = (relevantChunks.length > 0 ? relevantChunks : course.chunks.slice(0, 2))
-    .join('\n\n')
+  const sourceContent = (
+    relevantChunks.length > 0 ? relevantChunks : course.chunks.slice(0, 2)
+  )
+    .join("\n\n")
     .substring(0, 6000);
   const { difficulty, language } = course.metadata;
 
- const prompt = `Generate a DETAILED COURSE CHAPTER in ${language}.
+  const prompt = `Generate a DETAILED COURSE CHAPTER in ${language}.
 
 CHAPTER:
 - Title: ${chapter.title}
 - Summary: ${chapter.summary}
-- Concepts to cover: ${(chapter.concepts || []).join(', ')}
+- Concepts to cover: ${(chapter.concepts || []).join(", ")}
 
 SOURCE CONTENT FROM DOCUMENT:
 ${sourceContent}
@@ -466,22 +488,29 @@ OUTPUT FORMAT:
     }
   ]
 }`;
- 
+
   try {
-    const result = await callAI([
-      { role: 'system', content: 'Tu génères du contenu de cours détaillé en JSON valide.' },
-      { role: 'user', content: prompt }
-    ], true, 4000);
+    const result = await callAI(
+      [
+        {
+          role: "system",
+          content: "Tu génères du contenu de cours détaillé en JSON valide.",
+        },
+        { role: "user", content: prompt },
+      ],
+      true,
+      4000,
+    );
     let chapterContent;
     try {
       chapterContent = JSON.parse(result);
     } catch (e) {
-      console.error('JSON invalide, fallback');
+      console.error("JSON invalide, fallback");
       chapterContent = {
         content: `# ${chapter.title}\n\n${chapter.summary}\n\n${sourceContent.substring(0, 1500)}`,
-        keyPoints: chapter.concepts || ['Concept à étudier'],
+        keyPoints: chapter.concepts || ["Concept à étudier"],
         examples: [],
-        questions: []
+        questions: [],
       };
     }
     return {
@@ -491,43 +520,46 @@ OUTPUT FORMAT:
       examples: chapterContent.examples || [],
       questions: chapterContent.questions || [],
       isGenerated: true,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   } catch (error) {
-    console.error('❌ Erreur génération chapitre:', error);
-    throw new Error(error?.message || 'Erreur génération chapitre');
+    console.error("❌ Erreur génération chapitre:", error);
+    throw new Error(error?.message || "Erreur génération chapitre");
   }
 };
- 
+
 /**
-* 🚀 Fonction principale
-*/
+ * 🚀 Fonction principale
+ */
 export const generateCourseFromAI = async (params) => {
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🚀 DÉBUT GÉNÉRATION COURS');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🚀 DÉBUT GÉNÉRATION COURS");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   // 1. Générer le plan (1 requête analyse + 1 requête plan = 2 requêtes)
   const plan = await generateCoursePlan(params);
   // 2. Générer le premier chapitre (1 requête)
-  console.log('📝 Génération du premier chapitre...');
+  console.log("📝 Génération du premier chapitre...");
   try {
     const firstChapter = await generateChapterContent(plan, 0);
     plan.chapters[0] = firstChapter;
-    console.log('✅ Premier chapitre généré');
+    console.log("✅ Premier chapitre généré");
   } catch (error) {
-    console.warn('⚠️ Premier chapitre échoué, sera généré à la demande:', error.message);
+    console.warn(
+      "⚠️ Premier chapitre échoué, sera généré à la demande:",
+      error.message,
+    );
   }
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('✅ COURS GÉNÉRÉ AVEC SUCCÈS');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("✅ COURS GÉNÉRÉ AVEC SUCCÈS");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   return plan;
 };
- 
+
 /**
-* Évaluation de code
-*/
+ * Évaluation de code
+ */
 export const evaluateCode = async (userCode, question) => {
-const prompt = `Evaluate this code strictly for Guidewire Gosu.
+  const prompt = `Evaluate this code strictly for Guidewire Gosu.
 Do NOT mark it correct if the output does not match exactly.
 Provide detailed feedback specific to Gosu and Guidewire best practices.
 
@@ -552,12 +584,16 @@ Return JSON only:
   "suggestions": [],
   "correctedCode": null
 }`;
- 
+
   try {
-    const result = await callAI([
-      { role: 'system', content: 'Tu évalues du code en JSON.' },
-      { role: 'user', content: prompt }
-    ], true, 1500);
+    const result = await callAI(
+      [
+        { role: "system", content: "Tu évalues du code en JSON." },
+        { role: "user", content: prompt },
+      ],
+      true,
+      1500,
+    );
     return JSON.parse(result);
   } catch (error) {
     return {
@@ -566,16 +602,23 @@ Return JSON only:
       message: `Erreur: ${error?.message || error}`,
       errors: [],
       suggestions: [],
-      correctedCode: null
+      correctedCode: null,
     };
   }
 };
- 
+
 export const getHint = async (question, userCode) => {
   try {
-    const result = await callAI([
-      { role: 'user', content: `Indice subtil pour: ${question.question}\nCode: ${userCode || 'vide'}\nJSON: {"hint": "indice court"}` }
-    ], true, 300);
+    const result = await callAI(
+      [
+        {
+          role: "user",
+          content: `Indice subtil pour: ${question.question}\nCode: ${userCode || "vide"}\nJSON: {"hint": "indice court"}`,
+        },
+      ],
+      true,
+      300,
+    );
     return JSON.parse(result).hint;
   } catch (error) {
     return "Réfléchissez étape par étape.";

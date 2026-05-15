@@ -1,23 +1,25 @@
-const STATS_KEY = 'onboarding_stats';
-const COURSES_KEY = 'onboarding_courses';
-const PROGRESS_KEY = 'onboarding_progress';
+const STATS_KEY = "onboarding_stats";
+const COURSES_KEY = "onboarding_courses";
+const PROGRESS_KEY = "onboarding_progress";
 
 /**
  * Récupère les statistiques globales
  */
 export const getStats = () => {
   const stats = localStorage.getItem(STATS_KEY);
-  return stats ? JSON.parse(stats) : {
-    totalCourses: 0,
-    completedCourses: 0,
-    totalQuestions: 0,
-    correctAnswers: 0,
-    totalLearningTime: 0, // minutes
-    weeklyProgress: [],
-    questionTypes: { functional: 0, technical: 0 },
-    lastActivity: null,
-    streakDays: 0
-  };
+  return stats
+    ? JSON.parse(stats)
+    : {
+        totalCourses: 0,
+        completedCourses: 0,
+        totalQuestions: 0,
+        correctAnswers: 0,
+        totalLearningTime: 0, // minutes
+        weeklyProgress: [],
+        questionTypes: { functional: 0, technical: 0 },
+        lastActivity: null,
+        streakDays: 0,
+      };
 };
 
 /**
@@ -32,36 +34,40 @@ export const saveStats = (stats) => {
  */
 export const recordActivity = (type, data = {}) => {
   const stats = getStats();
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   switch (type) {
-    case 'course_created':
+    case "course_created":
       stats.totalCourses++;
       break;
-    case 'course_completed':
+    case "course_completed":
       stats.completedCourses++;
       break;
-    case 'question_answered':
+    case "question_answered":
       stats.totalQuestions++;
       if (data.correct) stats.correctAnswers++;
-      if (data.questionType === 'functional') stats.questionTypes.functional++;
-      if (data.questionType === 'technical') stats.questionTypes.technical++;
+      if (data.questionType === "functional") stats.questionTypes.functional++;
+      if (data.questionType === "technical") stats.questionTypes.technical++;
       break;
-    case 'time_spent':
+    case "time_spent":
       stats.totalLearningTime += data.minutes || 0;
       break;
   }
 
   // Update weekly progress
-  const weekProgress = stats.weeklyProgress.find(w => w.date === today);
+  const weekProgress = stats.weeklyProgress.find((w) => w.date === today);
   if (weekProgress) {
-    weekProgress.score = Math.round((stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100);
+    weekProgress.score = Math.round(
+      (stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100,
+    );
     weekProgress.questions = stats.totalQuestions;
   } else {
     stats.weeklyProgress.push({
       date: today,
-      score: Math.round((stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100),
-      questions: stats.totalQuestions
+      score: Math.round(
+        (stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100,
+      ),
+      questions: stats.totalQuestions,
     });
     if (stats.weeklyProgress.length > 7) stats.weeklyProgress.shift();
   }
@@ -76,7 +82,7 @@ export const recordActivity = (type, data = {}) => {
  */
 export const saveCourse = (course) => {
   const courses = getCourses();
-  const existing = courses.findIndex(c => c.id === course.id);
+  const existing = courses.findIndex((c) => c.id === course.id);
   if (existing >= 0) {
     courses[existing] = course;
   } else {
@@ -92,7 +98,7 @@ export const getCourses = () => {
 };
 
 export const getCourseById = (id) => {
-  return getCourses().find(c => c.id === id);
+  return getCourses().find((c) => c.id === id);
 };
 
 /**
@@ -110,13 +116,15 @@ export const getAllProgress = () => {
 };
 
 export const getCourseProgress = (courseId) => {
-  return getAllProgress()[courseId] || {
-    completedChapters: [],
-    answeredQuestions: {},
-    currentChapter: 0,
-    startedAt: null,
-    completedAt: null
-  };
+  return (
+    getAllProgress()[courseId] || {
+      completedChapters: [],
+      answeredQuestions: {},
+      currentChapter: 0,
+      startedAt: null,
+      completedAt: null,
+    }
+  );
 };
 
 /**
@@ -124,7 +132,9 @@ export const getCourseProgress = (courseId) => {
  */
 export const getCourseCompletion = (course, progress) => {
   if (!course || !course.chapters) return 0;
-  return Math.round((progress.completedChapters.length / course.chapters.length) * 100);
+  return Math.round(
+    (progress.completedChapters.length / course.chapters.length) * 100,
+  );
 };
 
 /**
@@ -132,7 +142,7 @@ export const getCourseCompletion = (course, progress) => {
  */
 export const deleteCourse = (courseId) => {
   // Supprimer le cours
-  const courses = getCourses().filter(c => c.id !== courseId);
+  const courses = getCourses().filter((c) => c.id !== courseId);
   localStorage.setItem(COURSES_KEY, JSON.stringify(courses));
 
   // Supprimer la progression associée
@@ -143,13 +153,13 @@ export const deleteCourse = (courseId) => {
   // Mettre à jour les stats
   const stats = getStats();
   stats.totalCourses = Math.max(0, stats.totalCourses - 1);
-  
+
   // Si le cours était terminé, décrémenter aussi
   const progress = getCourseProgress(courseId);
   if (progress.completedAt) {
     stats.completedCourses = Math.max(0, stats.completedCourses - 1);
   }
-  
+
   saveStats(stats);
   return courses;
 };
@@ -160,12 +170,12 @@ export const deleteCourse = (courseId) => {
 export const deleteAllCourses = () => {
   localStorage.removeItem(COURSES_KEY);
   localStorage.removeItem(PROGRESS_KEY);
-  
+
   const stats = getStats();
   stats.totalCourses = 0;
   stats.completedCourses = 0;
   saveStats(stats);
-  
+
   return [];
 };
 
@@ -174,8 +184,8 @@ export const deleteAllCourses = () => {
  */
 export const updateChapter = (courseId, chapterIndex, chapterData) => {
   const courses = getCourses();
-  const courseIdx = courses.findIndex(c => c.id === courseId);
-  
+  const courseIdx = courses.findIndex((c) => c.id === courseId);
+
   if (courseIdx >= 0) {
     courses[courseIdx].chapters[chapterIndex] = chapterData;
     localStorage.setItem(COURSES_KEY, JSON.stringify(courses));
@@ -189,8 +199,8 @@ export const updateChapter = (courseId, chapterIndex, chapterData) => {
  */
 export const updateCourse = (courseId, updates) => {
   const courses = getCourses();
-  const courseIdx = courses.findIndex(c => c.id === courseId);
-  
+  const courseIdx = courses.findIndex((c) => c.id === courseId);
+
   if (courseIdx >= 0) {
     courses[courseIdx] = { ...courses[courseIdx], ...updates };
     localStorage.setItem(COURSES_KEY, JSON.stringify(courses));

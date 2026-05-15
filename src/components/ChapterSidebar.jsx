@@ -29,7 +29,7 @@ function ChapterSidebar({ course, currentChapter, completedChapters, onSelectCha
           const isGenerated = chapter.isGenerated;
           const questionsAnswered = Object.keys(progress.answeredQuestions || {})
             .filter(k => k.startsWith(`ch${idx}_`)).length;
-          
+
           return (
             <div
               key={idx}
@@ -37,10 +37,10 @@ function ChapterSidebar({ course, currentChapter, completedChapters, onSelectCha
               onClick={() => onSelectChapter(idx)}
             >
               <div className="chapter-icon">
-                {isCompleted ? <CheckCircle size={18} /> : 
-                 isCurrent ? <BookOpen size={18} /> : 
-                 !isGenerated ? <Sparkles size={14} /> :
-                 <span>{idx + 1}</span>}
+                {isCompleted ? <CheckCircle size={18} /> :
+                  isCurrent ? <BookOpen size={18} /> :
+                    !isGenerated ? <Sparkles size={14} /> :
+                      <span>{idx + 1}</span>}
               </div>
               <div className="chapter-info">
                 <h4>

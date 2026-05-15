@@ -30,7 +30,7 @@ function Sidebar() {
           <h2>⚡ OnboardAI</h2>
           <p>LEARN BY DOING</p>
         </div>
-        
+
         <nav>
           <NavLink to="/" className="nav-link" end>
             <Home size={18} /> Dashboard
@@ -38,7 +38,7 @@ function Sidebar() {
           <NavLink to="/upload" className="nav-link">
             <Upload size={18} /> Nouveau Cours
           </NavLink>
-          
+
           <div className="nav-section">
             <p className="nav-title">📚 Mes Cours ({courses.length})</p>
             {courses.length === 0 ? (
@@ -49,7 +49,7 @@ function Sidebar() {
                   <NavLink to={`/course/${course.id}`} className="nav-link nav-course">
                     <BookOpen size={14} />
                     <span className="course-name">{course.title}</span>
-                    <button 
+                    <button
                       className="nav-delete-btn"
                       onClick={(e) => handleDelete(e, course.id, course.title)}
                       title="Supprimer"

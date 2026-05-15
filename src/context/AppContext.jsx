@@ -16,9 +16,9 @@ const defaultValue = {
   },
   courses: [],
   currentCourse: null,
-  refreshStats: () => {},
-  refreshCourses: () => {},
-  setCurrentCourse: () => {}
+  refreshStats: () => { },
+  refreshCourses: () => { },
+  setCurrentCourse: () => { }
 };
 
 const AppContext = createContext(defaultValue);

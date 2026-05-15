@@ -20,9 +20,8 @@ function QCMQuestion({ question, onAnswered }) {
         {question.options.map((option, idx) => (
           <label
             key={idx}
-            className={`option ${selected === idx ? 'selected' : ''} ${
-              submitted && idx === question.correctAnswer ? 'correct' : ''
-            } ${submitted && selected === idx && !isCorrect ? 'wrong' : ''}`}
+            className={`option ${selected === idx ? 'selected' : ''} ${submitted && idx === question.correctAnswer ? 'correct' : ''
+              } ${submitted && selected === idx && !isCorrect ? 'wrong' : ''}`}
           >
             <input
               type="radio"

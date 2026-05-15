@@ -10,8 +10,8 @@ function Dashboard() {
   const { stats, courses, refreshCourses, refreshStats } = useApp();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const accuracy = stats.totalQuestions > 0 
-    ? Math.round((stats.correctAnswers / stats.totalQuestions) * 100) 
+  const accuracy = stats.totalQuestions > 0
+    ? Math.round((stats.correctAnswers / stats.totalQuestions) * 100)
     : 0;
 
   const handleDelete = (courseId, courseName) => {
@@ -36,11 +36,11 @@ function Dashboard() {
     { label: 'Précision', value: `${accuracy}%`, icon: <Target size={24} />, color: '#58a6ff' },
   ];
 
-  const weeklyData = stats.weeklyProgress.length > 0 
+  const weeklyData = stats.weeklyProgress.length > 0
     ? stats.weeklyProgress.map(w => ({
-        name: new Date(w.date).toLocaleDateString('fr', { day: '2-digit', month: 'short' }),
-        score: w.score,
-      }))
+      name: new Date(w.date).toLocaleDateString('fr', { day: '2-digit', month: 'short' }),
+      score: w.score,
+    }))
     : [{ name: 'Aujourd\'hui', score: 0 }];
 
   const categoryData = [
@@ -167,8 +167,8 @@ function Dashboard() {
                   <button className="btn-secondary" onClick={() => navigate(`/course/${course.id}`)}>
                     {completion === 100 ? '🏆 Revoir' : '▶ Continuer'}
                   </button>
-                  <button 
-                    className="btn-delete" 
+                  <button
+                    className="btn-delete"
                     onClick={(e) => { e.stopPropagation(); handleDelete(course.id, course.title); }}
                     title="Supprimer ce cours"
                   >
