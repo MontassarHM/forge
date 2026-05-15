@@ -254,7 +254,7 @@ function UploadCourse() {
 
           <div className="form-group">
             <label>📝 Spécifications supplémentaires (optionnel)</label>
-            <textarea
+            <textarea className="textarea-input"
               placeholder="Ex: Concentrez-vous sur les cas pratiques, exemples de code, ou détails spécifiques"
               value={specification}
               onChange={e => setSpecification(e.target.value)}

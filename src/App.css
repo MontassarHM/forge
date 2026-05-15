@@ -1673,6 +1673,27 @@ body::before {
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
+.textarea-input {
+  width: 100%;
+  min-height: 150px;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-darker);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: 0.2s ease;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.textarea-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
 .short-answer-feedback.success {
   background: var(--green-dim);
   border: 1px solid var(--green);
