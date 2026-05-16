@@ -62,20 +62,21 @@ function UploadCourse() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (files.length === 0) return alert('Téléchargez au moins un document');
+    if (files.length === 0) return alert('Please upload at least one document');
 
     setLoading(true);
     try {
-      setProgress('Lecture des documents');
-      setProgressDetail('Extraction du contenu en cours...');
+      setProgress('Reading documents');
+      setProgressDetail('Extracting content...');
+
       const content = await parseMultipleFiles(files);
 
       if (content.length < 100) {
-        throw new Error('Le contenu extrait est trop court.');
+        throw new Error('The extracted content is too short.');
       }
 
-      setProgress('Analyse par l\'IA');
-      setProgressDetail(`Document de ${Math.round(content.length / 1000)}k caractères en cours d'analyse...`);
+      setProgress('AI Analysis');
+      setProgressDetail(`Analyzing document of ${Math.round(content.length / 1000)}k characters...`);
 
       const courseData = await generateCourseFromAI({
         content,
@@ -83,8 +84,8 @@ function UploadCourse() {
         difficulty,
       });
 
-      setProgress('Finalisation');
-      setProgressDetail('Préparation de votre parcours d\'apprentissage');
+      setProgress('Finalizing');
+      setProgressDetail('Preparing your learning journey');
 
       const course = {
         ...courseData,
@@ -93,6 +94,7 @@ function UploadCourse() {
         duration,
         sourceFiles: files.map(f => f.name)
       };
+
       saveCourse(course);
       recordActivity('course_created');
 
@@ -100,9 +102,9 @@ function UploadCourse() {
       refreshStats();
       navigate(`/course/${course.id}`);
     } catch (error) {
-      console.error('Erreur complète:', error);
-      const errorMessage = error?.message || 'Erreur inconnue';
-      alert(`Erreur:\n\n${errorMessage}`);
+      console.error('Full error:', error);
+      const errorMessage = error?.message || 'Unknown error';
+      alert(`Error:\n\n${errorMessage}`);
     } finally {
       setLoading(false);
       setProgress('');
@@ -118,10 +120,10 @@ function UploadCourse() {
           <Sparkles size={36} />
         </div>
         <h1 className="upload-hero-title">
-          Créer un nouveau <span className="text-accent">cours</span>
+          Create a new <span className="text-accent">course</span>
         </h1>
         <p className="upload-hero-subtitle">
-          Transformez vos documents en parcours d'apprentissage interactif avec l'IA
+          Turn your documents into interactive learning journeys using AI
         </p>
       </div>
 
@@ -131,17 +133,17 @@ function UploadCourse() {
           <div className="step-header">
             <div className="step-number">01</div>
             <div>
-              <h3>Importer vos documents</h3>
-              <p>PDF, DOCX, TXT ou Markdown</p>
+              <h3>Upload Your Documents</h3>
+              <p>PDF, DOCX, TXT, or Markdown</p>
             </div>
           </div>
 
           <div
             className={`upload-zone-v2 ${dragActive ? 'drag-active' : ''}`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
+            onDragEnter={!loading ? handleDrag : undefined}
+            onDragLeave={!loading ? handleDrag : undefined}
+            onDragOver={!loading ? handleDrag : undefined}
+            onDrop={!loading ? handleDrop : undefined}
           >
             <input
               type="file"
@@ -150,13 +152,14 @@ function UploadCourse() {
               id="file-input"
               accept=".pdf,.txt,.docx,.md"
               hidden
+              disabled={loading}
             />
             <label htmlFor="file-input" className="upload-label-v2">
               <div className="upload-icon-circle">
                 <Upload size={32} />
               </div>
-              <p className="upload-title">Glissez vos fichiers ici</p>
-              <p className="upload-subtitle">ou <span className="text-accent">cliquez pour parcourir</span></p>
+              <p className="upload-title">Drag your files here</p>
+              <p className="upload-subtitle">or <span className="text-accent">click to browse</span></p>
               <div className="file-types">
                 <span className="file-type-badge">PDF</span>
                 <span className="file-type-badge">DOCX</span>
@@ -179,7 +182,8 @@ function UploadCourse() {
                     type="button"
                     onClick={() => removeFile(idx)}
                     className="file-card-remove"
-                    title="Retirer"
+                    title="Remove"
+                    disabled={loading}
                   >
                     <X size={16} />
                   </button>
@@ -194,8 +198,8 @@ function UploadCourse() {
           <div className="step-header">
             <div className="step-number">02</div>
             <div>
-              <h3>Configurer votre cours</h3>
-              <p>Personnalisez l'expérience d'apprentissage</p>
+              <h3>Configure Your Course</h3>
+              <p>Customize the learning experience</p>
             </div>
           </div>
 
@@ -204,7 +208,7 @@ function UploadCourse() {
             <div className="config-card">
               <div className="config-card-header">
                 <Clock size={18} />
-                <span>Durée totale</span>
+                <span>Total Duration</span>
               </div>
               <input
                 type="number"
@@ -213,6 +217,7 @@ function UploadCourse() {
                 min="10"
                 max="480"
                 className="config-input"
+                disabled={loading}
               />
               <p className="config-hint">{duration} minutes</p>
             </div>
@@ -221,44 +226,49 @@ function UploadCourse() {
             <div className="config-card">
               <div className="config-card-header">
                 <Target size={18} />
-                <span>Difficulté</span>
+                <span>Difficulty</span>
               </div>
               <div className="difficulty-options">
                 <button
                   type="button"
                   className={`diff-btn ${difficulty === 'easy' ? 'active' : ''}`}
-                  onClick={() => setDifficulty('easy')}
+                  onClick={() => !loading && setDifficulty('easy')}
+                  disabled={loading}
                 >
                   <span className="diff-dots">●○○</span>
-                  Débutant
+                  Beginner
                 </button>
                 <button
                   type="button"
                   className={`diff-btn ${difficulty === 'medium' ? 'active' : ''}`}
-                  onClick={() => setDifficulty('medium')}
+                  onClick={() => !loading && setDifficulty('medium')}
+                  disabled={loading}
                 >
                   <span className="diff-dots">●●○</span>
-                  Intermédiaire
+                  Intermediate
                 </button>
                 <button
                   type="button"
                   className={`diff-btn ${difficulty === 'hard' ? 'active' : ''}`}
-                  onClick={() => setDifficulty('hard')}
+                  onClick={() => !loading && setDifficulty('hard')}
+                  disabled={loading}
                 >
                   <span className="diff-dots">●●●</span>
-                  Avancé
+                  Advanced
                 </button>
               </div>
             </div>
           </div>
 
           <div className="form-group">
-            <label>📝 Spécifications supplémentaires (optionnel)</label>
-            <textarea className="textarea-input"
-              placeholder="Ex: Concentrez-vous sur les cas pratiques, exemples de code, ou détails spécifiques"
+            <label>📝 Additional Specifications (optional)</label>
+            <textarea
+              className="textarea-input"
+              placeholder="E.g., Focus on practical cases, code examples, or specific details"
               value={specification}
               onChange={e => setSpecification(e.target.value)}
               rows={3}
+              disabled={loading}
             />
           </div>
         </div>
@@ -288,12 +298,12 @@ function UploadCourse() {
           {loading ? (
             <>
               <Loader className="spin" size={20} />
-              Génération en cours...
+              Generating course...
             </>
           ) : (
             <>
               <Zap size={20} />
-              Générer le cours
+              Generate Course
             </>
           )}
         </button>
@@ -302,13 +312,13 @@ function UploadCourse() {
         <div className="info-box">
           <div className="info-box-header">
             <Sparkles size={16} />
-            <span>Comment ça marche ?</span>
+            <span>How it works?</span>
           </div>
           <ul className="info-box-list">
-            <li>L'IA analyse votre document en profondeur</li>
-            <li>Un plan de cours structuré est créé automatiquement</li>
-            <li>Chaque chapitre est généré avec du contenu détaillé</li>
-            <li>Des questions interactives sont créées pour tester vos connaissances</li>
+            <li>The AI deeply analyzes your document</li>
+            <li>A structured course outline is automatically created</li>
+            <li>Each chapter is generated with detailed content</li>
+            <li>Interactive questions are created to test your knowledge</li>
           </ul>
         </div>
       </form>

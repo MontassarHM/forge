@@ -35,58 +35,54 @@ function Sidebar() {
           <NavLink to="/" className="nav-link" end>
             <Home size={18} /> Dashboard
           </NavLink>
+
           <NavLink to="/upload" className="nav-link">
-            <Upload size={18} /> Nouveau Cours
+            <Upload size={18} /> New Course
           </NavLink>
 
           <div className="nav-section">
-            <p className="nav-title">📚 Mes Cours ({courses.length})</p>
+            <p className="nav-title">📚 My Courses ({courses.length})</p>
+
             {courses.length === 0 ? (
-              <p className="nav-empty">Aucun cours créé</p>
+              <p className="nav-empty">No courses created</p>
             ) : (
-              courses.slice(0, 8).map(course => (
-                <div key={course.id} className="nav-course-wrapper">
-                  <NavLink to={`/course/${course.id}`} className="nav-link nav-course">
-                    <BookOpen size={14} />
-                    <span className="course-name">{course.title}</span>
-                    <button
-                      className="nav-delete-btn"
-                      onClick={(e) => handleDelete(e, course.id, course.title)}
-                      title="Supprimer"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </NavLink>
-                </div>
-              ))
+              <div className="courses-scroll">
+                {courses.map(course => (
+                  <div key={course.id} className="nav-course-wrapper">
+                    <NavLink to={`/course/${course.id}`} className="nav-link nav-course">
+                      <BookOpen size={14} />
+                      <span className="course-name">{course.title}</span>
+
+                      <button
+                        className="nav-delete-btn"
+                        onClick={(e) => handleDelete(e, course.id, course.title)}
+                        title="Delete"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </NavLink>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
           <div className="nav-section">
             <p className="nav-title">🏆 Stats</p>
+
             <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span className="xp-badge">
                 <Zap size={12} /> {stats.totalQuestions * 10} XP
               </span>
+
               {stats.streakDays > 0 && (
                 <span className="streak-badge">
-                  🔥 {stats.streakDays} jours
+                  🔥 {stats.streakDays} days
                 </span>
               )}
             </div>
           </div>
         </nav>
-
-        <div className="user-card">
-          <div className="avatar">JD</div>
-          <div>
-            <p className="user-name">John Doe</p>
-            <p className="user-role">
-              <Trophy size={10} style={{ display: 'inline', marginRight: 4 }} />
-              Niveau {Math.floor(stats.totalQuestions / 10) + 1}
-            </p>
-          </div>
-        </div>
       </aside>
 
       {/* Modal */}
@@ -96,17 +92,21 @@ function Sidebar() {
             <div className="modal-icon">
               <AlertTriangle size={48} />
             </div>
-            <h3>Supprimer ce cours ?</h3>
+
+            <h3>Delete this course?</h3>
+
             <p>
-              Êtes-vous sûr de supprimer <strong>"{deleteConfirm.name}"</strong> ?
-              <br />Cette action est <strong>irréversible</strong>.
+              Are you sure you want to delete <strong>"{deleteConfirm.name}"</strong>?
+              <br />This action is <strong>irreversible</strong>.
             </p>
+
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setDeleteConfirm(null)}>
-                Annuler
+                Cancel
               </button>
+
               <button className="btn-danger" onClick={confirmDelete}>
-                <Trash2 size={16} /> Supprimer
+                <Trash2 size={16} /> Delete
               </button>
             </div>
           </div>

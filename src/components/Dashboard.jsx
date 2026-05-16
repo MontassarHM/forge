@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { BookOpen, CheckCircle, Clock, Plus, Zap, Flame, Target, Trash2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getCourseProgress, getCourseCompletion, deleteCourse } from '../services/statsService';
@@ -50,10 +50,10 @@ function Dashboard() {
 
   // Animate stat cards
   const statCards = [
-    { label: 'Cours créés', value: stats.totalCourses, icon: <BookOpen size={24} />, color: '#FFD700' },
-    { label: 'Cours terminés', value: stats.completedCourses, icon: <CheckCircle size={24} />, color: '#00FF7F' },
-    { label: 'Temps total', value: liveLearningTime, icon: <Clock size={24} />, color: '#8A2BE2' },
-    { label: 'Précision', value: `${accuracy}%`, icon: <Target size={24} />, color: '#1E90FF' },
+    { label: 'Courses created', value: stats.totalCourses, icon: <BookOpen size={24} />, color: '#FFD700' },
+    { label: 'Completed courses', value: stats.completedCourses, icon: <CheckCircle size={24} />, color: '#00FF7F' },
+    { label: 'Total time', value: liveLearningTime, icon: <Clock size={24} />, color: '#8A2BE2' },
+    { label: 'Accuracy', value: `${accuracy}%`, icon: <Target size={24} />, color: '#1E90FF' },
   ];
 
   const weeklyData = stats.weeklyProgress.length > 0
@@ -77,17 +77,17 @@ function Dashboard() {
       <div className="dashboard-header animated fadeInDown">
         <div>
           <h1>⚡Dashboard</h1>
-          <p className="subtitle">Apprends, progresse et gagne de l'XP !</p>
+          <p className="subtitle">Learn, progress, and earn XP!</p>
         </div>
         <button className="btn-primary" onClick={() => navigate('/upload')}>
-          <Plus size={18} /> Nouveau cours
+          <Plus size={18} /> New Course
         </button>
       </div>
 
       {/* XP Banner */}
       <div className="xp-banner animated fadeInUp">
         <div className="xp-stat">
-          <p className="xp-label">Niveau actuel</p>
+          <p className="xp-label">Current Level</p>
           <div className="xp-bar-container">
             <div className="xp-bar" style={{ width: `${(stats.totalQuestions % 10) * 10}%` }} />
           </div>
@@ -113,7 +113,7 @@ function Dashboard() {
           </div>
         </div>
         <div className="xp-stat">
-          <p className="xp-label">XP Total</p>
+          <p className="xp-label">Total XP</p>
           <h3 className="xp-value">{stats.totalQuestions * 10} XP</h3>
         </div>
         <div className="xp-stat">
@@ -122,7 +122,7 @@ function Dashboard() {
             <div className="streak-bar" style={{ width: `${Math.min(stats.streakDays * 10, 100)}%` }} />
           </div>
           <h3 className="xp-value streak">
-            <Flame size={20} /> {stats.streakDays || 0} jours
+            <Flame size={20} /> {stats.streakDays || 0} days
           </h3>
         </div>
       </div>
@@ -142,7 +142,7 @@ function Dashboard() {
 
       {/* Charts */}
       <div className="chart-card animated fadeInUp">
-        <h3>📈 Progression Hebdomadaire</h3>
+        <h3>📈 Weekly Progress</h3>
         {weeklyData.length > 1 ? (
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={weeklyData}>
@@ -152,18 +152,19 @@ function Dashboard() {
               <Line type="monotone" dataKey="score" stroke="#FFD700" strokeWidth={3} dot={{ fill: '#FFD700', r: 5 }} animationDuration={1000} />
             </LineChart>
           </ResponsiveContainer>
-        ) : <div className="empty-chart">📊 Pas encore de données</div>}
+        ) : <div className="empty-chart">📊 No data yet</div>}
       </div>
+
       {/* Courses List */}
       <div className="recent-courses">
         <div className="section-header animated fadeIn">
-          <h3>📚 Mes cours</h3>
+          <h3>📚 My Courses</h3>
         </div>
         {courses.length === 0 ? (
           <div className="empty-courses animated fadeIn">
-            <p>🎓 Aucun cours créé pour le moment</p>
+            <p>🎓 No courses created yet</p>
             <button className="btn-primary" onClick={() => navigate('/upload')}>
-              <Plus size={18} /> Créer mon premier cours
+              <Plus size={18} /> Create my first course
             </button>
           </div>
         ) : (
@@ -177,13 +178,11 @@ function Dashboard() {
                   <div className="course-icon" onClick={() => navigate(`/course/${course.id}`)}>📘</div>
                   <div className="course-info" onClick={() => navigate(`/course/${course.id}`)}>
                     <h4>{course.title}</h4>
-                    <p>{course.chapters?.length || 0} chapitres • {course.difficulty}</p>
+                    <p>{course.chapters?.length || 0} chapters • {course.difficulty}</p>
                   </div>
                   <div className="course-progress" onClick={() => navigate(`/course/${course.id}`)}>
                     <div className="progress-bar">
-                      {/* Background */}
                       <div className="progress-bar-bg">
-                        {/* Filled part */}
                         <div
                           className="progress-fill"
                           style={{
@@ -195,12 +194,12 @@ function Dashboard() {
                     <span className="progress-label">{completion}%</span>
                   </div>
                   <button className="btn-secondary" onClick={() => navigate(`/course/${course.id}`)}>
-                    {completion === 100 ? '🏆 Revoir' : '▶ Continuer'}
+                    {completion === 100 ? '🏆 Review' : '▶ Continue'}
                   </button>
                   <button
                     className="btn-delete"
                     onClick={(e) => { e.stopPropagation(); handleDelete(course.id, course.title); }}
-                    title="Supprimer ce cours"
+                    title="Delete this course"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -218,15 +217,15 @@ function Dashboard() {
             <div className="modal-icon">
               <AlertTriangle size={48} />
             </div>
-            <h3>Supprimer ce cours ?</h3>
+            <h3>Delete this course?</h3>
             <p>
-              Êtes-vous sûr de vouloir supprimer <strong>"{deleteConfirm.name}"</strong> ?
-              <br />Cette action est <strong>irréversible</strong> et toute la progression sera perdue.
+              Are you sure you want to delete <strong>"{deleteConfirm.name}"</strong>?
+              <br />This action is <strong>irreversible</strong> and all progress will be lost.
             </p>
             <div className="modal-actions">
-              <button className="btn-secondary" onClick={cancelDelete}>Annuler</button>
+              <button className="btn-secondary" onClick={cancelDelete}>Cancel</button>
               <button className="btn-danger" onClick={confirmDelete}>
-                <Trash2 size={16} /> Supprimer
+                <Trash2 size={16} /> Delete
               </button>
             </div>
           </div>

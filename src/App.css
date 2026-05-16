@@ -2900,3 +2900,20 @@ body::before {
   from { transform: rotate(0deg); }
   to { transform: rotate(180deg); }
 }
+
+.courses-scroll {
+  max-height: 300px; /* Adjust based on your sidebar height */
+  overflow-y: auto;
+  padding-right: 4px; /* For scrollbar spacing */
+  scroll-behavior: smooth;
+
+}
+
+.courses-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.courses-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}

@@ -39,14 +39,14 @@ function QCMQuestion({ question, onAnswered }) {
 
       {!submitted ? (
         <button onClick={handleSubmit} className="btn-primary" disabled={selected === null}>
-          Soumettre
+          Submit
         </button>
       ) : (
         <div className={`feedback ${isCorrect ? 'success' : 'error'}`}>
-          <strong>{isCorrect ? '✅ Correct !' : '❌ Incorrect'}</strong>
+          <strong>{isCorrect ? '✅ Correct!' : '❌ Incorrect'}</strong>
           <p>{question.explanation}</p>
           {!isCorrect && (
-            <p><strong>Bonne réponse:</strong> {question.options[question.correctAnswer]}</p>
+            <p><strong>Correct answer:</strong> {question.options[question.correctAnswer]}</p>
           )}
         </div>
       )}

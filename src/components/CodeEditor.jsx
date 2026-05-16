@@ -12,24 +12,6 @@ function CodeEditor({ question, onAnswered }) {
   const [hint, setHint] = useState('');
   const [hintLoading, setHintLoading] = useState(false);
 
-  // const runCode = () => {
-  //   try {
-  //     const logs = [];
-  //     const originalLog = console.log;
-  //     console.log = (...args) => logs.push(args.map(a => 
-  //       typeof a === 'object' ? JSON.stringify(a) : String(a)
-  //     ).join(' '));
-
-  //     // eslint-disable-next-line no-new-func
-  //     const result = new Function(code)();
-
-  //     console.log = originalLog;
-  //     setOutput(logs.join('\n') + (result !== undefined ? `\n=> ${result}` : ''));
-  //   } catch (error) {
-  //     setOutput(`❌ Erreur: ${error.message}`);
-  //   }
-  // };
-
   const runCode = async () => {
     setrun(true);
     setFeedback(null);
@@ -122,15 +104,19 @@ function CodeEditor({ question, onAnswered }) {
       </div>
 
       <div className="editor-actions">
-        <button onClick={runCode} className="btn-secondary"><Play size={16} />
-          {run ?? <Loader className="spin" size={16} />} Run</button>
+        <button onClick={runCode} className="btn-secondary">
+          <Play size={16} />
+          {run ?? <Loader className="spin" size={16} />} Run
+        </button>
         <button onClick={submitCode} className="btn-primary" disabled={loading}>
           {loading ? <Loader className="spin" size={16} /> : <Check size={16} />} Submit
         </button>
         <button onClick={fetchHint} className="btn-outline" disabled={hintLoading}>
-          <Lightbulb size={16} /> {hintLoading ? '...' : 'Indice'}
+          <Lightbulb size={16} /> {hintLoading ? '...' : 'Hint'}
         </button>
-        <button onClick={reset} className="btn-outline"><RotateCcw size={16} /> Reset</button>
+        <button onClick={reset} className="btn-outline">
+          <RotateCcw size={16} /> Reset
+        </button>
       </div>
 
       {output && (
@@ -142,7 +128,7 @@ function CodeEditor({ question, onAnswered }) {
 
       {hint && (
         <div className="hint-box">
-          💡 <strong>Indice:</strong> {hint}
+          💡 <strong>Hint:</strong> {hint}
         </div>
       )}
 
@@ -151,7 +137,7 @@ function CodeEditor({ question, onAnswered }) {
 
           <div className="feedback-header">
             <strong>
-              {feedback.correct ? '✅ Excellent !' : '❌ Pas tout à fait...'}
+              {feedback.correct ? '✅ Excellent!' : '❌ Not quite...'}
             </strong>
 
             {typeof feedback.score === 'number' && (
@@ -169,7 +155,7 @@ function CodeEditor({ question, onAnswered }) {
           {/* ERRORS SAFE */}
           {Array.isArray(feedback.errors) && feedback.errors.length > 0 && (
             <div className="errors-list">
-              <strong>⚠️ Erreurs:</strong>
+              <strong>⚠️ Errors:</strong>
               <ul>
                 {feedback.errors.map((e, i) => (
                   <li key={i}>
@@ -197,7 +183,7 @@ function CodeEditor({ question, onAnswered }) {
           {/* CORRECTION SAFE */}
           {feedback.correctedCode && typeof feedback.correctedCode === 'string' && (
             <details className="corrected-section">
-              <summary>📝 Voir la correction</summary>
+              <summary>📝 View Correction</summary>
               <pre className="corrected-code">
                 {feedback.correctedCode}
               </pre>
