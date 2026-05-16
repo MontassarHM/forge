@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import {XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { BookOpen, CheckCircle, Clock, Plus, Zap, Flame, Target, Trash2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getCourseProgress, getCourseCompletion, deleteCourse } from '../services/statsService';
@@ -63,12 +63,13 @@ function Dashboard() {
     }))
     : [{ name: 'Aujourd\'hui', score: 0 }];
 
-  const categoryData = [
-    { name: 'QCM', value: stats.questionTypes.functional },
-    { name: 'Code', value: stats.questionTypes.technical },
-  ].filter(c => c.value > 0);
-
-  const COLORS = ['#00FF7F', '#FFD700'];
+  const level = Math.floor(stats.totalQuestions / 10) + 1;
+  const currentXP = stats.totalQuestions * 10;
+  const currentLevelXP = (level - 1) * 100;
+  const nextLevelXP = level * 100;
+  const xpInLevel = currentXP - currentLevelXP;
+  const xpNeeded = nextLevelXP - currentLevelXP;
+  const xpPercent = Math.min(100, Math.round((xpInLevel / xpNeeded) * 100));
 
   return (
     <div className="dashboard">
@@ -90,9 +91,30 @@ function Dashboard() {
           <div className="xp-bar-container">
             <div className="xp-bar" style={{ width: `${(stats.totalQuestions % 10) * 10}%` }} />
           </div>
-          <h3 className="xp-value level">
-            <Zap size={20} /> Level {Math.floor(stats.totalQuestions / 10) + 1}
-          </h3>
+          <div className="xp-level-card">
+            <div className="xp-level-header">
+              <h3 className="xp-value level">
+                <Zap size={20} /> Level {level}
+              </h3>
+              <span className="xp-next">
+                {xpInLevel}/{xpNeeded} XP
+              </span>
+            </div>
+
+            <div className="fun-progress-container">
+              <div
+                className="fun-progress-bar"
+                style={{ '--xp-percent': `${xpPercent}%` }}
+              >
+                <div className="fun-progress-shine"></div>
+                <div className="fun-progress-particles"></div>
+              </div>
+            </div>
+
+            <p className="xp-progress-text">
+              {Math.round(xpPercent)}% vers le prochain niveau
+            </p>
+          </div>
         </div>
         <div className="xp-stat">
           <p className="xp-label">XP Total</p>
