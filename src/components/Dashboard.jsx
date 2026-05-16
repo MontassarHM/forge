@@ -110,10 +110,6 @@ function Dashboard() {
                 <div className="fun-progress-particles"></div>
               </div>
             </div>
-
-            <p className="xp-progress-text">
-              {Math.round(xpPercent)}% vers le prochain niveau
-            </p>
           </div>
         </div>
         <div className="xp-stat">
