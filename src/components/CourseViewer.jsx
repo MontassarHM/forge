@@ -22,12 +22,10 @@ function CourseViewer() {
   const { refreshStats, refreshCourses } = useApp();
   const [chatOpen, setChatOpen] = useState(false);
 
-  // ✅ TOUS les hooks au début, AVANT toute condition de retour
   const [course, setCourse] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [showQuestions, setShowQuestions] = useState(false);
   const [progress, setProgress] = useState({ completedChapters: [], answeredQuestions: {}, currentChapter: 0 });
-  const [startTime] = useState(Date.now());
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [generatingChapter, setGeneratingChapter] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -69,7 +67,7 @@ function CourseViewer() {
       setChatMessages(prev => [...prev, { from: "ai", text: aiText }]);
     } catch (err) {
       console.error(err);
-      setChatMessages(prev => [...prev, { from: "ai", text: "Erreur lors de la génération" }]);
+      setChatMessages(prev => [...prev, { from: "ai", text: "Error generating response" }]);
     }
 
     setChatInput("");
@@ -79,7 +77,7 @@ function CourseViewer() {
   useEffect(() => {
     const c = getCourseById(id);
     if (!c) {
-      alert("Cours introuvable");
+      alert("Course not found");
       navigate("/");
       return;
     }
@@ -144,7 +142,7 @@ function CourseViewer() {
 
     setGeneratingChapter(true);
     try {
-      console.log('🤖 Génération du chapitre', currentChapter + 1);
+      console.log('🤖 Chapter generation', currentChapter + 1);
       const generatedChapter = await generateChapterContent(course, currentChapter);
 
       const updatedCourse = { ...course };
@@ -153,8 +151,8 @@ function CourseViewer() {
 
       updateChapter(course.id, currentChapter, generatedChapter);
     } catch (error) {
-      console.error('Erreur génération:', error);
-      alert(`Erreur lors de la génération: ${error.message}`);
+      console.error('Generation error:', error);
+      alert(`Error during generation: ${error.message}`);
     } finally {
       setGeneratingChapter(false);
     }
@@ -166,14 +164,14 @@ function CourseViewer() {
     const nextIdx = currentChapter + 1;
     if (nextIdx < course.chapters.length && !course.chapters[nextIdx].isGenerated) {
       try {
-        console.log('🔄 Préchargement du chapitre', nextIdx + 1);
+        console.log('🔄 Preloading the chapter', nextIdx + 1);
         const nextChapter = await generateChapterContent(course, nextIdx);
         const updatedCourse = { ...course };
         updatedCourse.chapters[nextIdx] = nextChapter;
         setCourse(updatedCourse);
         updateChapter(course.id, nextIdx, nextChapter);
       } catch (error) {
-        console.error('Erreur préchargement:', error);
+        console.error('Preloading error:', error);
       }
     }
   };
