@@ -40,39 +40,58 @@ export const recordActivity = (type, data = {}) => {
     case "course_created":
       stats.totalCourses++;
       break;
+
     case "course_completed":
       stats.completedCourses++;
       break;
+
     case "question_answered":
       stats.totalQuestions++;
       if (data.correct) stats.correctAnswers++;
       if (data.questionType === "functional") stats.questionTypes.functional++;
       if (data.questionType === "technical") stats.questionTypes.technical++;
       break;
+
     case "time_spent":
-      stats.totalLearningTime += data.minutes || 0;
+      let minutesToAdd = 0;
+
+      if (data.minutes != null) {
+        minutesToAdd = Number(data.minutes);
+      } else if (data.ms != null) {
+        // Convert milliseconds to minutes
+        minutesToAdd = Number(data.ms) / 1000 / 60;
+      }
+
+      if (isNaN(minutesToAdd) || minutesToAdd < 0 || minutesToAdd > 1440) {
+        // Sanity check: don’t allow negative or absurdly huge minutes (more than 1 day)
+        console.warn("recordActivity: Invalid minutes:", minutesToAdd);
+        minutesToAdd = 0;
+      }
+
+      stats.totalLearningTime += minutesToAdd;
       break;
   }
 
   // Update weekly progress
   const weekProgress = stats.weeklyProgress.find((w) => w.date === today);
+  const score = Math.round(
+    (stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100,
+  );
+
   if (weekProgress) {
-    weekProgress.score = Math.round(
-      (stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100,
-    );
+    weekProgress.score = score;
     weekProgress.questions = stats.totalQuestions;
   } else {
     stats.weeklyProgress.push({
       date: today,
-      score: Math.round(
-        (stats.correctAnswers / Math.max(stats.totalQuestions, 1)) * 100,
-      ),
+      score,
       questions: stats.totalQuestions,
     });
     if (stats.weeklyProgress.length > 7) stats.weeklyProgress.shift();
   }
 
   stats.lastActivity = new Date().toISOString();
+
   saveStats(stats);
   return stats;
 };

@@ -34,14 +34,19 @@ function CourseViewer() {
   useEffect(() => {
     const c = getCourseById(id);
     if (!c) {
-      alert('Cours introuvable');
-      navigate('/');
+      alert("Cours introuvable");
+      navigate("/");
       return;
     }
+
+    const savedProgress = getCourseProgress(id);
     setCourse(c);
-    const p = getCourseProgress(id);
-    setProgress(p);
-    setCurrentChapter(p.currentChapter || 0);
+    setProgress(savedProgress);
+
+    // Ensure currentChapter is valid
+    setCurrentChapter(
+      savedProgress.currentChapter != null ? savedProgress.currentChapter : 0
+    );
   }, [id, navigate]);
 
   // Auto-génération du chapitre actuel
@@ -69,16 +74,20 @@ function CourseViewer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChapter, course?.chapters?.[currentChapter]?.isGenerated]);
 
-  // Tracking du temps
   useEffect(() => {
-    return () => {
-      const minutes = Math.round((Date.now() - startTime) / 60000);
-      if (minutes > 0) {
-        recordActivity('time_spent', { minutes });
-        refreshStats();
-      }
-    };
-  }, [startTime, refreshStats]);
+    const interval = setInterval(() => {
+      const savedProgress = getCourseProgress(id);
+      const now = Date.now();
+      const start = savedProgress.startedAt || now;
+      const minutes = (now - start) / 1000 / 60;
+
+      saveProgress(id, { ...savedProgress, startedAt: savedProgress.startedAt || now });
+      recordActivity("time_spent", { minutes });
+      refreshStats();
+    }, 15000); // every 15s
+
+    return () => clearInterval(interval);
+  }, [id, refreshStats]);
 
   // ===== Fonctions =====
 
@@ -125,38 +134,63 @@ function CourseViewer() {
   };
 
   const handleSelectChapter = (idx) => {
+    if (!course) return;
+
+    const savedProgress = getCourseProgress(id); // get latest from storage
+    const updatedProgress = {
+      ...savedProgress,
+      currentChapter: idx,
+    };
+
+    saveProgress(id, updatedProgress); // persist immediately
+    setProgress(updatedProgress);
     setCurrentChapter(idx);
     setShowQuestions(false);
-    const newProgress = { ...progress, currentChapter: idx };
-    setProgress(newProgress);
-    saveProgress(id, newProgress);
   };
 
   const handleQuestionAnswered = (questionId, correct, questionType) => {
+    const savedProgress = getCourseProgress(id); // merge latest
     const key = `ch${currentChapter}_${questionId}`;
-    const newAnswered = {
-      ...progress.answeredQuestions,
-      [key]: { correct, answeredAt: new Date().toISOString() }
+    const answeredQuestions = {
+      ...savedProgress.answeredQuestions,
+      [key]: { correct, answeredAt: new Date().toISOString(), questionType },
     };
-    const newProgress = { ...progress, answeredQuestions: newAnswered };
-    setProgress(newProgress);
-    saveProgress(id, newProgress);
-    recordActivity('question_answered', { correct, questionType });
+
+    const updatedProgress = {
+      ...savedProgress,
+      answeredQuestions,
+      currentChapter,
+    };
+
+    setProgress(updatedProgress);
+    saveProgress(id, updatedProgress); // persist immediately
+    recordActivity("question_answered", { correct, questionType });
     refreshStats();
   };
 
   const handleCompleteChapter = () => {
-    if (!progress.completedChapters.includes(currentChapter)) {
-      const newCompleted = [...progress.completedChapters, currentChapter];
-      const newProgress = { ...progress, completedChapters: newCompleted };
+    const savedProgress = getCourseProgress(id);
+
+    if (!savedProgress.completedChapters.includes(currentChapter)) {
+      const newCompleted = [...savedProgress.completedChapters, currentChapter];
+
+      const updatedProgress = {
+        ...savedProgress,
+        completedChapters: newCompleted,
+        currentChapter,
+        completedAt:
+          newCompleted.length === course.chapters.length
+            ? new Date().toISOString()
+            : savedProgress.completedAt,
+      };
+
+      setProgress(updatedProgress);
+      saveProgress(id, updatedProgress);
 
       if (newCompleted.length === course.chapters.length) {
-        newProgress.completedAt = new Date().toISOString();
-        recordActivity('course_completed');
+        recordActivity("course_completed");
       }
 
-      setProgress(newProgress);
-      saveProgress(id, newProgress);
       refreshStats();
 
       if (currentChapter < course.chapters.length - 1) {
