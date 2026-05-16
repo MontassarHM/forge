@@ -2727,3 +2727,176 @@ body::before {
     xpPulse 2s infinite ease-in-out,
     floatBadge 3s infinite ease-in-out;
 }
+
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+/* FAB BUTTON */
+.chat-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #111827;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+
+  transition: all 0.25s ease;
+  animation: floatIn 0.4s ease;
+}
+
+.chat-fab:hover {
+  transform: scale(1.08);
+}
+
+.chat-fab.open {
+  transform: rotate(180deg);
+}
+
+/* PANEL */
+.chat-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+
+  width: 320px;
+  height: 420px;
+
+  background: #0b1220;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+
+  transition: all 0.25s ease;
+}
+
+.chat-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* HEADER */
+.chat-header {
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-size: 14px;
+}
+
+/* MESSAGES */
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* MESSAGE BUBBLES */
+.chat-msg {
+  max-width: 80%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+
+  animation: fadeIn 0.2s ease;
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+}
+
+.chat-msg.ai {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.06);
+  color: #e5e7eb;
+}
+
+/* INPUT */
+.chat-input {
+  display: flex;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+}
+
+.chat-input button {
+  padding: 10px 14px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* BUBBLE ANIMATION */
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0.7); }
+  50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Ajouter une animation continue au FAB */
+.chat-fab {
+  animation: floatIn 0.4s ease, pulse 2s infinite alternate, bounce 2.5s infinite;
+  transition: all 0.25s ease;
+}
+
+/* Quand le chat est ouvert, on arrête le bounce/pulse pour ne pas gêner */
+.chat-fab.open {
+  animation: rotate 0.25s ease forwards;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}

@@ -13,13 +13,14 @@ import {
   deleteCourse,
   updateChapter
 } from '../services/statsService';
-import { generateChapterContent } from '../services/aiService';
+import { generateChapterContent, generateAIResponse } from '../services/aiService';
 import { useApp } from '../context/AppContext';
 
 function CourseViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { refreshStats, refreshCourses } = useApp();
+  const [chatOpen, setChatOpen] = useState(false);
 
   // ✅ TOUS les hooks au début, AVANT toute condition de retour
   const [course, setCourse] = useState(null);
@@ -29,6 +30,50 @@ function CourseViewer() {
   const [startTime] = useState(Date.now());
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [generatingChapter, setGeneratingChapter] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+
+  const sendMessage = async () => {
+    if (!chatInput.trim()) return;
+
+    setChatMessages(prev => [...prev, { from: "user", text: chatInput }]);
+
+    try {
+      const responseText = await generateAIResponse(chatInput, course);
+
+      let aiText = "";
+
+      if (typeof responseText === "string") {
+        try {
+          const data = JSON.parse(responseText);
+          // Transformer l'objet en string lisible
+          aiText = Object.values(data)
+            .map(v => {
+              if (Array.isArray(v)) return v.join("\n- ");
+              return v;
+            })
+            .join("\n");
+        } catch {
+          // si ce n’est pas JSON, utiliser le texte brut
+          aiText = responseText;
+        }
+      } else if (typeof responseText === "object") {
+        // platifier l'objet en string
+        aiText = Object.values(responseText)
+          .map(v => (Array.isArray(v) ? v.join("\n- ") : v))
+          .join("\n");
+      } else {
+        aiText = String(responseText);
+      }
+
+      setChatMessages(prev => [...prev, { from: "ai", text: aiText }]);
+    } catch (err) {
+      console.error(err);
+      setChatMessages(prev => [...prev, { from: "ai", text: "Erreur lors de la génération" }]);
+    }
+
+    setChatInput("");
+  };
 
   // Chargement du cours
   useEffect(() => {
@@ -439,8 +484,39 @@ function CourseViewer() {
             Suivant <ChevronRight />
           </button>
         </div>
+        <div className="chat-widget">
+          {/* BOUTON FLOTTANT */}
+          <button
+            className={`chat-fab ${chatOpen ? "open" : ""}`}
+            onClick={() => setChatOpen(!chatOpen)}> 🤖
+          </button>
+          <div className={`chat-panel ${chatOpen ? "open" : ""}`}>
+            <div className="chat-header">
+              <span>Assistant</span>
+              <button onClick={() => setChatOpen(false)}>✕</button>
+            </div>
+            <div className="chat-messages">
+              {chatMessages.map((m, i) => (
+                <div key={i} className={`chat-msg ${m.from}`}>
+                  {typeof m.text === "string"
+                    ? m.text
+                    : JSON.stringify(m.text)
+                  }
+                </div>
+              ))}
+            </div>
+            <div className="chat-input">
+              <input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask something..."
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              />
+              <button onClick={sendMessage}>Send</button>
+            </div>
+          </div>
+        </div>
       </div>
-
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => setDeleteConfirm(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>

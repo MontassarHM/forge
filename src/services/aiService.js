@@ -624,3 +624,19 @@ export const getHint = async (question, userCode) => {
     return "Réfléchissez étape par étape.";
   }
 };
+
+export async function generateAIResponse(question, course) {
+  const prompt = `
+Réponds de manière simple à la question suivante.
+Ne renvoie pas JSON, pas d'exemples séparés, juste une réponse textuelle.
+Question: ${question}
+  `;
+
+  const response = await callAI(
+    [{ role: "user", content: prompt }],
+    true,
+    1500,
+  );
+
+  return response.text || response; // retourne uniquement le texte
+}
