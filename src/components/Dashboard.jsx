@@ -52,7 +52,7 @@ function Dashboard() {
   const statCards = [
     { label: 'Courses created', value: stats.totalCourses, icon: <BookOpen size={24} />, color: '#FFD700' },
     { label: 'Completed courses', value: stats.completedCourses, icon: <CheckCircle size={24} />, color: '#00FF7F' },
-    { label: 'Total time', value: liveLearningTime, icon: <Clock size={24} />, color: '#8A2BE2' },
+    // { label: 'Total time', value: liveLearningTime, icon: <Clock size={24} />, color: '#8A2BE2' },
     { label: 'Accuracy', value: `${accuracy}%`, icon: <Target size={24} />, color: '#1E90FF' },
   ];
 
