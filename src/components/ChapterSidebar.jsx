@@ -14,15 +14,15 @@ function ChapterSidebar({ course, currentChapter, completedChapters, onSelectCha
           <div className="progress-bar">
             <div className="progress-fill" style={{ width: `${completionPct}%` }} />
           </div>
-          <span>{completionPct}% complété</span>
+          <span>{completionPct}% completed</span>
         </div>
         <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
-          ✨ {generatedCount}/{course.chapters.length} chapitres générés
+          ✨ {generatedCount}/{course.chapters.length} chapters generated
         </div>
       </div>
 
       <div className="chapters-list">
-        <p className="chapters-label">📚 CHAPITRES ({course.chapters.length})</p>
+        <p className="chapters-label">📚 CHAPTERS ({course.chapters.length})</p>
         {course.chapters.map((chapter, idx) => {
           const isCompleted = completedChapters.includes(idx);
           const isCurrent = currentChapter === idx;
@@ -42,26 +42,39 @@ function ChapterSidebar({ course, currentChapter, completedChapters, onSelectCha
                     !isGenerated ? <Sparkles size={14} /> :
                       <span>{idx + 1}</span>}
               </div>
+
               <div className="chapter-info">
                 <h4>
                   {chapter.title}
-                  {!isGenerated && <span style={{ marginLeft: 6, fontSize: '0.7rem', color: 'var(--accent)' }}>✨</span>}
+                  {!isGenerated && (
+                    <span style={{ marginLeft: 6, fontSize: '0.7rem', color: 'var(--accent)' }}>
+                      ✨
+                    </span>
+                  )}
                 </h4>
+
                 <div className="chapter-meta">
                   <span>⏱️ {chapter.duration || 15} min</span>
                   {isGenerated && chapter.questions && (
                     <span>📝 {chapter.questions.length} questions</span>
                   )}
                 </div>
+
                 {questionsAnswered > 0 && (
                   <div className="chapter-progress-mini">
                     <Brain size={12} />
-                    <span>{questionsAnswered} répondues</span>
+                    <span>{questionsAnswered} answered</span>
                   </div>
                 )}
+
                 {!isGenerated && (
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2, fontStyle: 'italic' }}>
-                    Cliquez pour générer
+                  <div style={{
+                    fontSize: '0.65rem',
+                    color: 'var(--text-muted)',
+                    marginTop: 2,
+                    fontStyle: 'italic'
+                  }}>
+                    Click to generate
                   </div>
                 )}
               </div>

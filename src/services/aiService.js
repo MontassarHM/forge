@@ -1,15 +1,14 @@
 const BACKEND_URL = "http://localhost:5000";
 
-// ✅ Rate limiter SIMPLE et FIABLE
 let lastRequestTime = 0;
-const MIN_DELAY_BETWEEN_REQUESTS = 2500; // 2.5 secondes entre chaque requête
+const MIN_DELAY_BETWEEN_REQUESTS = 2500;
 
 const waitForRateLimit = async () => {
   const now = Date.now();
   const elapsed = now - lastRequestTime;
   if (elapsed < MIN_DELAY_BETWEEN_REQUESTS) {
     const waitTime = MIN_DELAY_BETWEEN_REQUESTS - elapsed;
-    console.log(`⏳ Attente ${(waitTime / 1000).toFixed(1)}s...`);
+    console.log(`⏳ Waiting ${(waitTime / 1000).toFixed(1)}s...`);
     await new Promise((r) => setTimeout(r, waitTime));
   }
   lastRequestTime = Date.now();
@@ -28,7 +27,7 @@ const callAI = async (
     try {
       await waitForRateLimit();
 
-      console.log(`📤 Appel IA (essai ${attempt}/${retries})...`);
+      console.log(`📤 AI call (attempt ${attempt}/${retries})...`);
 
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: "POST",
@@ -59,11 +58,11 @@ const callAI = async (
         // Limiter l'attente max à 60s
         waitTime = Math.min(waitTime, 60000);
         console.log(
-          `⚠️ Rate limit. Attente ${(waitTime / 1000).toFixed(0)}s (essai ${attempt}/${retries})`,
+          `⚠️ Rate limit. Waiting ${(waitTime / 1000).toFixed(0)}s (attempt ${attempt}/${retries})`
         );
         if (attempt === retries) {
           throw new Error(
-            `Rate limit Groq atteint. Attendez 1 minute et réessayez.`,
+            `Groq rate limit reached. Please wait 1 minute and try again.`
           );
         }
         await new Promise((r) => setTimeout(r, waitTime));
@@ -75,9 +74,9 @@ const callAI = async (
       try {
         data = JSON.parse(responseText);
       } catch (e) {
-        console.error("❌ Réponse non-JSON:", responseText.substring(0, 200));
+        console.error("❌ Non-JSON response:", responseText.substring(0, 200));
         throw new Error(
-          `Réponse invalide du serveur (status ${response.status})`,
+          `Invalid server response (status ${response.status})`
         );
       }
 
@@ -88,7 +87,7 @@ const callAI = async (
 
       const content = data?.choices?.[0]?.message?.content;
       if (!content) {
-        throw new Error("Réponse vide de l'IA");
+        throw new Error("Empty response from AI");
       }
 
       console.log("✅ Réponse OK");
@@ -127,7 +126,7 @@ const chunkDocument = (content, chunkSize = 8000) => {
  * 🧠 Analyse en UNE SEULE requête
  */
 const analyzeDocument = async (content) => {
-  console.log("📊 Analyse globale du document...");
+  console.log("📊 Performing global document analysis...");
   // Tronquer si trop long
   const truncated = content.substring(0, 12000);
   const prompt = `Analyze this document and extract the main topics.
@@ -148,7 +147,7 @@ Respond in JSON:
       [
         {
           role: "system",
-          content: "Tu analyses des documents et réponds en JSON valide.",
+          content: "You analyze documents and respond with valid JSON.",
         },
         { role: "user", content: prompt },
       ],
@@ -157,14 +156,14 @@ Respond in JSON:
     );
     return JSON.parse(result);
   } catch (error) {
-    console.error("❌ Erreur analyse:", error);
+    console.error("❌ Analysis error:", error);
     return {
-      mainTopic: "Document analysé",
+      mainTopic: "Document analyzed",
       subTopics: [
         "Introduction",
-        "Concepts clés",
+        "Key concepts",
         "Applications",
-        "Cas pratiques",
+        "Practical cases",
         "Conclusion",
       ],
       keyTerms: [],
@@ -212,7 +211,7 @@ export const generateCoursePlan = async ({
   specification,
 }) => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("🚀 GÉNÉRATION PLAN COURS");
+  console.log("🚀 COURSE PLAN GENERATION");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   try {
@@ -273,7 +272,6 @@ ${detectedSections.join("\n")}
 ━━━━━━━━━━━━━━━
 
 - Language: ${language}
-- Difficulty: ${difficulty}
 - Duration: ${duration} minutes
 
 ━━━━━━━━━━━━━━━
@@ -329,7 +327,7 @@ IMPORTANT:
         {
           role: "system",
           content:
-            "Tu génères des plans de cours pédagogiques très structurés en JSON valide.",
+            "You generate highly structured pedagogical course plans in valid JSON.",
         },
         {
           role: "user",
@@ -346,14 +344,13 @@ IMPORTANT:
     try {
       plan = JSON.parse(result);
     } catch (e) {
-      console.error("❌ JSON invalide:", result);
-
-      throw new Error("Réponse JSON invalide");
+      console.error("❌ Invalid JSON:", result);
+      throw new Error("Invalid JSON response");
     }
 
     // ✅ Validation
     if (!plan.chapters || !Array.isArray(plan.chapters)) {
-      throw new Error("Structure du plan invalide");
+      throw new Error("Invalid plan structure");
     }
 
     // ✅ Enrichissement
@@ -379,14 +376,14 @@ IMPORTANT:
     }));
 
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log(`✅ PLAN GÉNÉRÉ (${plan.chapters.length} chapitres)`);
+    console.log(`✅ PLAN GENERATED (${plan.chapters.length} chapters)`);
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     return plan;
   } catch (error) {
-    console.error("❌ ERREUR generateCoursePlan:", error);
+    console.error("❌ ERROR generateCoursePlan:", error);
 
-    throw new Error(error?.message || "Erreur génération plan");
+    throw new Error(error?.message || "Plan generation error");
   }
 };
 
@@ -396,10 +393,10 @@ IMPORTANT:
 export const generateChapterContent = async (course, chapterIndex) => {
   const chapter = course.chapters[chapterIndex];
   if (chapter.isGenerated) {
-    console.log("📦 Chapitre déjà généré");
+  console.log("📦 Chapter already generated");
     return chapter;
   }
-  console.log(`📝 Génération chapitre ${chapterIndex + 1}: ${chapter.title}`);
+  console.log(`📝 Generating chapter ${chapterIndex + 1}: ${chapter.title}`);
   // Trouver les chunks pertinents pour ce chapitre
   const chapterTopics = [...(chapter.topics || []), ...(chapter.concepts || [])]
     .join(" ")
@@ -441,7 +438,7 @@ INSTRUCTIONS:
 2. Use multiple paragraphs separated ONLY by \\n\\n
 3. Base EVERYTHING strictly on the source content
 4. DO NOT invent information outside the source
-5. Generate exactly 3 questions
+5. Generate exactly 3 ${difficulty} questions
 6. Question types MUST be one of:
    - "mcq"
    - "coding"
@@ -494,25 +491,28 @@ OUTPUT FORMAT:
       [
         {
           role: "system",
-          content: "Tu génères du contenu de cours détaillé en JSON valide.",
+          content: "You generate detailed course content in valid JSON.",
         },
         { role: "user", content: prompt },
       ],
       true,
       4000,
     );
+
     let chapterContent;
+
     try {
       chapterContent = JSON.parse(result);
     } catch (e) {
-      console.error("JSON invalide, fallback");
+      console.error("Invalid JSON, fallback");
       chapterContent = {
         content: `# ${chapter.title}\n\n${chapter.summary}\n\n${sourceContent.substring(0, 1500)}`,
-        keyPoints: chapter.concepts || ["Concept à étudier"],
+        keyPoints: chapter.concepts || ["Concept to study"],
         examples: [],
         questions: [],
       };
     }
+
     return {
       ...chapter,
       content: chapterContent.content || chapter.summary,
@@ -523,8 +523,8 @@ OUTPUT FORMAT:
       generatedAt: new Date().toISOString(),
     };
   } catch (error) {
-    console.error("❌ Erreur génération chapitre:", error);
-    throw new Error(error?.message || "Erreur génération chapitre");
+    console.error("❌ Chapter generation error:", error);
+    throw new Error(error?.message || "Chapter generation error");
   }
 };
 
@@ -533,25 +533,28 @@ OUTPUT FORMAT:
  */
 export const generateCourseFromAI = async (params) => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("🚀 DÉBUT GÉNÉRATION COURS");
+  console.log("🚀 START COURSE GENERATION");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  // 1. Générer le plan (1 requête analyse + 1 requête plan = 2 requêtes)
+  // 1. Generate the plan (1 analysis request + 1 plan request = 2 requests)
   const plan = await generateCoursePlan(params);
-  // 2. Générer le premier chapitre (1 requête)
-  console.log("📝 Génération du premier chapitre...");
+
+  // 2. Generate the first chapter (1 request)
+  console.log("📝 Generating the first chapter...");
   try {
     const firstChapter = await generateChapterContent(plan, 0);
     plan.chapters[0] = firstChapter;
-    console.log("✅ Premier chapitre généré");
+    console.log("✅ First chapter generated");
   } catch (error) {
     console.warn(
-      "⚠️ Premier chapitre échoué, sera généré à la demande:",
+      "⚠️ First chapter failed, will be generated on demand:",
       error.message,
     );
   }
+
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("✅ COURS GÉNÉRÉ AVEC SUCCÈS");
+  console.log("✅ COURSE GENERATED SUCCESSFULLY");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
   return plan;
 };
 
@@ -588,7 +591,7 @@ Return JSON only:
   try {
     const result = await callAI(
       [
-        { role: "system", content: "Tu évalues du code en JSON." },
+        { role: "system", content: "You evaluate code in JSON." },
         { role: "user", content: prompt },
       ],
       true,
@@ -613,7 +616,7 @@ export const getHint = async (question, userCode) => {
       [
         {
           role: "user",
-          content: `Indice subtil pour: ${question.question}\nCode: ${userCode || "vide"}\nJSON: {"hint": "indice court"}`,
+          content: `Subtle hint for: ${question.question}\nCode: ${userCode || "empty"}\nJSON: {"hint": "short hint"}`,
         },
       ],
       true,
@@ -621,15 +624,15 @@ export const getHint = async (question, userCode) => {
     );
     return JSON.parse(result).hint;
   } catch (error) {
-    return "Réfléchissez étape par étape.";
+    return "Think step by step.";
   }
 };
 
 export async function generateAIResponse(question, course) {
   const prompt = `
-Réponds de manière simple à la question suivante.
-Ne renvoie pas JSON, pas d'exemples séparés, juste une réponse textuelle.
-Question: ${question}
+Answer the following question in a simple way.
+Do not return JSON, do not give separate examples, just a plain text answer.
+Question: ${question}S
   `;
 
   const response = await callAI(

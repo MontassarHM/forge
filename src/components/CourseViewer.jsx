@@ -22,12 +22,10 @@ function CourseViewer() {
   const { refreshStats, refreshCourses } = useApp();
   const [chatOpen, setChatOpen] = useState(false);
 
-  // ✅ TOUS les hooks au début, AVANT toute condition de retour
   const [course, setCourse] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [showQuestions, setShowQuestions] = useState(false);
   const [progress, setProgress] = useState({ completedChapters: [], answeredQuestions: {}, currentChapter: 0 });
-  const [startTime] = useState(Date.now());
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [generatingChapter, setGeneratingChapter] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -69,7 +67,7 @@ function CourseViewer() {
       setChatMessages(prev => [...prev, { from: "ai", text: aiText }]);
     } catch (err) {
       console.error(err);
-      setChatMessages(prev => [...prev, { from: "ai", text: "Erreur lors de la génération" }]);
+      setChatMessages(prev => [...prev, { from: "ai", text: "Error generating response" }]);
     }
 
     setChatInput("");
@@ -79,7 +77,7 @@ function CourseViewer() {
   useEffect(() => {
     const c = getCourseById(id);
     if (!c) {
-      alert("Cours introuvable");
+      alert("Course not found");
       navigate("/");
       return;
     }
@@ -144,7 +142,7 @@ function CourseViewer() {
 
     setGeneratingChapter(true);
     try {
-      console.log('🤖 Génération du chapitre', currentChapter + 1);
+      console.log('🤖 Chapter generation', currentChapter + 1);
       const generatedChapter = await generateChapterContent(course, currentChapter);
 
       const updatedCourse = { ...course };
@@ -153,8 +151,8 @@ function CourseViewer() {
 
       updateChapter(course.id, currentChapter, generatedChapter);
     } catch (error) {
-      console.error('Erreur génération:', error);
-      alert(`Erreur lors de la génération: ${error.message}`);
+      console.error('Generation error:', error);
+      alert(`Error during generation: ${error.message}`);
     } finally {
       setGeneratingChapter(false);
     }
@@ -166,14 +164,14 @@ function CourseViewer() {
     const nextIdx = currentChapter + 1;
     if (nextIdx < course.chapters.length && !course.chapters[nextIdx].isGenerated) {
       try {
-        console.log('🔄 Préchargement du chapitre', nextIdx + 1);
+        console.log('🔄 Preloading the chapter', nextIdx + 1);
         const nextChapter = await generateChapterContent(course, nextIdx);
         const updatedCourse = { ...course };
         updatedCourse.chapters[nextIdx] = nextChapter;
         setCourse(updatedCourse);
         updateChapter(course.id, nextIdx, nextChapter);
       } catch (error) {
-        console.error('Erreur préchargement:', error);
+        console.error('Preloading error:', error);
       }
     }
   };
@@ -272,11 +270,11 @@ function CourseViewer() {
         <div className="chapter-header">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
             <div>
-              <span className="chapter-badge">CHAPITRE {currentChapter + 1}/{course.chapters.length}</span>
+              <span className="chapter-badge">CHAPTER {currentChapter + 1}/{course.chapters.length}</span>
               <h2>{chapter.title}</h2>
               {isChapterCompleted && (
                 <span className="completed-badge">
-                  <CheckCircle size={16} /> Terminé
+                  <CheckCircle size={16} /> Completed
                 </span>
               )}
               {!isChapterGenerated && !generatingChapter && (
@@ -285,16 +283,16 @@ function CourseViewer() {
                   color: 'var(--accent)',
                   borderColor: 'var(--accent)'
                 }}>
-                  <Sparkles size={16} /> Pas encore généré
+                  <Sparkles size={16} /> Not yet generated
                 </span>
               )}
             </div>
             <button
               className="btn-delete-large"
               onClick={() => setDeleteConfirm(true)}
-              title="Supprimer ce cours"
+              title="Delete this course"
             >
-              <Trash2 size={16} /> Supprimer
+              <Trash2 size={16} /> Delete
             </button>
           </div>
         </div>
@@ -302,24 +300,24 @@ function CourseViewer() {
         {generatingChapter ? (
           <div className="generating-chapter">
             <Loader className="spin" size={48} />
-            <h3>🤖 Génération du chapitre en cours...</h3>
-            <p>L'IA est en train d'analyser le document et de créer le contenu détaillé.</p>
-            <p className="generating-detail">⏱️ Cela prend généralement 20-40 secondes</p>
+            <h3>🤖 Generating chapter...</h3>
+            <p>The AI is analyzing the document and creating detailed content.</p>
+            <p className="generating-detail">⏱️ This usually takes 20-40 seconds</p>
           </div>
         ) : !isChapterGenerated ? (
           <div className="generating-chapter">
             <Sparkles size={48} style={{ color: 'var(--accent)' }} />
-            <h3>📖 Chapitre prêt à être généré</h3>
+            <h3>📖 Chapter ready to be generated</h3>
             <p>{chapter.summary}</p>
             <button className="btn-primary btn-large" onClick={generateCurrentChapter}>
-              <Sparkles size={18} /> Générer le contenu
+              <Sparkles size={18} /> Generate content
             </button>
           </div>
         ) : !showQuestions ? (
           <>
             {chapter.summary && (
               <div className="chapter-summary">
-                <p>📌 <strong>Résumé:</strong> {chapter.summary}</p>
+                <p>📌 <strong>Summary:</strong> {chapter.summary}</p>
               </div>
             )}
 
@@ -360,7 +358,7 @@ function CourseViewer() {
 
             {chapter.examples && chapter.examples.length > 0 && (
               <div className="examples-section">
-                <h4>💡 Exemples</h4>
+                <h4>💡 Examples</h4>
                 <ul>
                   {chapter.examples.map((ex, i) => <li key={i}>{ex}</li>)}
                 </ul>
@@ -369,19 +367,19 @@ function CourseViewer() {
 
             {chapter.keyPoints && chapter.keyPoints.length > 0 && (
               <div className="key-points">
-                <h4>🔑 Points clés à retenir</h4>
+                <h4>🔑 Key points to remember</h4>
                 <ul>{chapter.keyPoints.map((p, i) => <li key={i}>{p}</li>)}</ul>
               </div>
             )}
 
             <button className="btn-primary btn-large" onClick={() => setShowQuestions(true)}>
-              <Brain size={18} /> Vérifier mes connaissances ({chapter.questions?.length || 0} questions)
+              <Brain size={18} /> Test your knowledge ({chapter.questions?.length || 0} questions)
             </button>
           </>
         ) : (
           <div className="questions-section">
             <h3>🧠 Check Knowledge - {chapter.title}</h3>
-            <p className="questions-intro">Répondez aux questions pour valider vos connaissances</p>
+            <p className="questions-intro">Answer the questions to validate your knowledge</p>
 
             {chapter.questions?.map((q, idx) => (
 
@@ -456,11 +454,11 @@ function CourseViewer() {
 
             <div className="chapter-actions">
               <button className="btn-secondary" onClick={() => setShowQuestions(false)}>
-                ← Retour au cours
+                ← Back to course
               </button>
               {!isChapterCompleted && (
                 <button className="btn-success" onClick={handleCompleteChapter}>
-                  <CheckCircle size={18} /> Terminer ce chapitre
+                  <CheckCircle size={18} /> Complete chapter
                 </button>
               )}
             </div>
@@ -472,7 +470,7 @@ function CourseViewer() {
             onClick={() => handleSelectChapter(currentChapter - 1)}
             disabled={currentChapter === 0}
           >
-            <ChevronLeft /> Précédent
+            <ChevronLeft /> Previous
           </button>
           <span className="page-indicator">
             {currentChapter + 1} / {course.chapters.length}
@@ -481,11 +479,11 @@ function CourseViewer() {
             onClick={() => handleSelectChapter(currentChapter + 1)}
             disabled={currentChapter === course.chapters.length - 1}
           >
-            Suivant <ChevronRight />
+            Next <ChevronRight />
           </button>
         </div>
         <div className="chat-widget">
-          {/* BOUTON FLOTTANT */}
+          {/* FLOATING BUTTON */}
           <button
             className={`chat-fab ${chatOpen ? "open" : ""}`}
             onClick={() => setChatOpen(!chatOpen)}> 🤖
@@ -523,17 +521,17 @@ function CourseViewer() {
             <div className="modal-icon">
               <AlertTriangle size={48} />
             </div>
-            <h3>Supprimer ce cours ?</h3>
+            <h3>Delete this course?</h3>
             <p>
-              Êtes-vous sûr de vouloir supprimer <strong>"{course.title}"</strong> ?
-              <br />Toute la progression sera perdue.
+              Are you sure you want to delete <strong>"{course.title}"</strong>?
+              <br />All progress will be lost.
             </p>
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setDeleteConfirm(false)}>
-                Annuler
+                Cancel
               </button>
               <button className="btn-danger" onClick={handleDeleteCourse}>
-                <Trash2 size={16} /> Supprimer
+                <Trash2 size={16} /> Delete
               </button>
             </div>
           </div>
