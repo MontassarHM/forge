@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Upload, BookOpen, Zap, Trophy, Trash2, AlertTriangle } from 'lucide-react';
+import { Home, Upload, BookOpen, Zap, Trophy, Trash2, AlertTriangle, LogOut, User } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { deleteCourse } from '../services/statsService';
 
 function Sidebar() {
   const navigate = useNavigate();
   const { courses, stats, refreshCourses, refreshStats } = useApp();
+  const { user, logout } = useAuth();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleDelete = (e, courseId, courseName) => {
     e.preventDefault();
@@ -21,6 +25,11 @@ function Sidebar() {
     refreshStats();
     setDeleteConfirm(null);
     navigate('/');
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   return (
@@ -83,9 +92,40 @@ function Sidebar() {
             </div>
           </div>
         </nav>
+
+        {/* User card avec menu */}
+        <div className="user-card-wrapper">
+          <button
+            className="user-card-btn"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+          >
+            <div className="avatar">{user?.avatar || 'U'}</div>
+            <div className="user-info">
+              <p className="user-name">{user?.name || 'Utilisateur'}</p>
+              <p className="user-role">
+                <Trophy size={10} style={{ display: 'inline', marginRight: 4 }} />
+                Level {Math.floor(stats.totalQuestions / 10) + 1}
+              </p>
+            </div>
+          </button>
+
+          {showUserMenu && (
+            <div className="user-menu">
+              <button
+                className="user-menu-item logout"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  setShowLogoutConfirm(true);
+                }}
+              >
+                <LogOut size={16} />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
       </aside>
 
-      {/* Modal */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -107,6 +147,34 @@ function Sidebar() {
 
               <button className="btn-danger" onClick={confirmDelete}>
                 <Trash2 size={16} /> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal déconnexion */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-icon" style={{
+              background: 'var(--accent-dim)',
+              color: 'var(--accent)',
+              borderColor: 'var(--accent)'
+            }}>
+              <LogOut size={48} />
+            </div>
+            <h3>Log out?</h3>
+            <p>
+              You will be disconnected from your session.
+              <br />Your data remains backed up.
+            </p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowLogoutConfirm(false)}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={handleLogout}>
+                <LogOut size={16} /> Logout
               </button>
             </div>
           </div>
