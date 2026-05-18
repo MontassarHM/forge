@@ -26,12 +26,12 @@ function Register() {
     const getPasswordStrength = () => {
         const pwd = formData.password;
         if (!pwd) return { level: 0, label: '', color: '' };
-        if (pwd.length < 6) return { level: 1, label: 'Trop court', color: '#f87171' };
-        if (pwd.length < 8) return { level: 2, label: 'Faible', color: '#fbbf24' };
+        if (pwd.length < 6) return { level: 1, label: 'Too short', color: '#f87171' };
+        if (pwd.length < 8) return { level: 2, label: 'Weak', color: '#fbbf24' };
         if (pwd.length >= 8 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd)) {
             return { level: 4, label: 'Excellent', color: '#4ade80' };
         }
-        return { level: 3, label: 'Moyen', color: '#60a5fa' };
+        return { level: 3, label: 'Medium', color: '#60a5fa' };
     };
 
     const passwordStrength = getPasswordStrength();
@@ -41,12 +41,12 @@ function Register() {
         setError('');
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Les mots de passe ne correspondent pas');
+            setError('Passwords do not match');
             return;
         }
 
         if (formData.password.length < 6) {
-            setError('Le mot de passe doit faire au moins 6 caractères');
+            setError('Password must be at least 6 characters long');
             return;
         }
 
