@@ -82,12 +82,16 @@ body::before {
   right: 0;
   bottom: 0;
   background-image:
-    radial-gradient(circle at 20% 30%,
+    radial-gradient(
+      circle at 20% 30%,
       rgba(251, 191, 36, 0.03) 0%,
-      transparent 50%),
-    radial-gradient(circle at 80% 70%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
       rgba(192, 132, 252, 0.03) 0%,
-      transparent 50%);
+      transparent 50%
+    );
   pointer-events: none;
   z-index: 0;
 }
@@ -318,9 +322,11 @@ body::before {
 
 /* XP Banner Boot.dev style */
 .xp-banner {
-  background: linear-gradient(135deg,
-      var(--bg-secondary) 0%,
-      var(--bg-tertiary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    var(--bg-tertiary) 100%
+  );
   border: 1px solid var(--border);
   padding: 24px 28px;
   border-radius: 12px;
@@ -408,10 +414,12 @@ body::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      var(--accent-dim),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-dim),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -1630,8 +1638,7 @@ body::before {
 .nav-delete-btn {
   position: absolute;
   right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 25%;
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -1639,7 +1646,6 @@ body::before {
   padding: 5px;
   border-radius: 5px;
   opacity: 0;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1870,12 +1876,16 @@ body::before {
   right: 0;
   height: 100vh;
   background-image:
-    radial-gradient(circle at 25% 25%,
+    radial-gradient(
+      circle at 25% 25%,
       rgba(251, 191, 36, 0.05) 1px,
-      transparent 1px),
-    radial-gradient(circle at 75% 75%,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 75% 75%,
       rgba(192, 132, 252, 0.05) 1px,
-      transparent 1px);
+      transparent 1px
+    );
   background-size:
     50px 50px,
     70px 70px;
@@ -1915,7 +1925,6 @@ body::before {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);
@@ -2402,7 +2411,6 @@ body::before {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     box-shadow: 0 0 0 0 var(--accent-dim);
@@ -2504,10 +2512,12 @@ body::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -2585,7 +2595,6 @@ body::before {
 }
 
 @keyframes sparkle {
-
   0%,
   100% {
     box-shadow:
@@ -2622,7 +2631,7 @@ body::before {
 .fun-progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #FFD700, #FF8C00, #FF69B4, #00FFFF);
+  background: linear-gradient(90deg, #ffd700, #ff8c00, #ff69b4, #00ffff);
   border-radius: 12px;
   position: relative;
   animation: fillFun 2s ease-out forwards;
@@ -2631,7 +2640,7 @@ body::before {
 
 /* Animated shine */
 .fun-progress-shine {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -50%;
@@ -2655,7 +2664,7 @@ body::before {
 
 .fun-progress-particles::before,
 .fun-progress-particles::after {
-  content: '✨';
+  content: "✨";
   position: absolute;
   font-size: 14px;
   animation: particlesMove 2s linear infinite;
@@ -2667,24 +2676,40 @@ body::before {
 
 /* Keyframes */
 @keyframes fillFun {
-  0% { width: 0%; }
-  100% { width: var(--xp-percent); } /* set this via JS inline style */
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--xp-percent);
+  } /* set this via JS inline style */
 }
 
 @keyframes shineMove {
-  0% { left: -50%; }
-  100% { left: 100%; }
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 @keyframes particlesMove {
-  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { transform: translateX(100%) rotate(360deg); opacity: 0; }
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(100%) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 /* Optional rocket emoji at the end */
 .fun-progress-bar::after {
-  content: '🚀';
+  content: "🚀";
   position: absolute;
   right: 0;
   top: -8px;
@@ -2693,8 +2718,12 @@ body::before {
 }
 
 @keyframes rocketBounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-6px); }
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-6px);
+  }
 }
 
 /* XP numbers */
@@ -2710,7 +2739,7 @@ body::before {
     rgba(255, 105, 180, 0.2)
   );
 
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 
   color: #fff;
   font-weight: 800;
@@ -2721,7 +2750,7 @@ body::before {
 
   box-shadow:
     0 0 12px rgba(255, 215, 0, 0.25),
-    inset 0 0 10px rgba(255,255,255,0.05);
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
 
   animation:
     xpPulse 2s infinite ease-in-out,
@@ -2750,7 +2779,7 @@ body::before {
   align-items: center;
   justify-content: center;
 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 
   transition: all 0.25s ease;
   animation: floatIn 0.4s ease;
@@ -2774,7 +2803,7 @@ body::before {
   height: 420px;
 
   background: #0b1220;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
 
   display: flex;
@@ -2798,7 +2827,7 @@ body::before {
 /* HEADER */
 .chat-header {
   padding: 12px;
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2835,14 +2864,14 @@ body::before {
 
 .chat-msg.ai {
   align-self: flex-start;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: #e5e7eb;
 }
 
 /* INPUT */
 .chat-input {
   display: flex;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chat-input input {
@@ -2864,30 +2893,59 @@ body::before {
 
 /* ANIMATIONS */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes floatIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* BUBBLE ANIMATION */
 @keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0.7); }
-  50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
-  100% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+  }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 /* Ajouter une animation continue au FAB */
 .chat-fab {
-  animation: floatIn 0.4s ease, pulse 2s infinite alternate, bounce 2.5s infinite;
+  animation:
+    floatIn 0.4s ease,
+    pulse 2s infinite alternate,
+    bounce 2.5s infinite;
   transition: all 0.25s ease;
 }
 
@@ -2897,8 +2955,12 @@ body::before {
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(180deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
 }
 
 .courses-scroll {
@@ -2906,7 +2968,6 @@ body::before {
   overflow-y: auto;
   padding-right: 4px; /* For scrollbar spacing */
   scroll-behavior: smooth;
-
 }
 
 .courses-scroll::-webkit-scrollbar {
@@ -2914,7 +2975,7 @@ body::before {
 }
 
 .courses-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 
@@ -2931,19 +2992,41 @@ body::before {
 
 .auth-bg-pattern {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(192, 132, 252, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.05) 0%, transparent 60%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(251, 191, 36, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(192, 132, 252, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(96, 165, 250, 0.05) 0%,
+      transparent 60%
+    );
   pointer-events: none;
   animation: bgFloat 20s ease-in-out infinite;
 }
 
 @keyframes bgFloat {
-  0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(30px, -30px); }
-  66% { transform: translate(-30px, 30px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(30px, -30px);
+  }
+  66% {
+    transform: translate(-30px, 30px);
+  }
 }
 
 .auth-container {
@@ -2972,7 +3055,11 @@ body::before {
 
 /* Left side decorative */
 .auth-side {
-  background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-tertiary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-darker) 0%,
+    var(--bg-tertiary) 100%
+  );
   padding: 48px 40px;
   display: flex;
   align-items: center;
@@ -2981,7 +3068,7 @@ body::before {
 }
 
 .auth-side::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 400px;
   height: 400px;
@@ -3121,9 +3208,16 @@ body::before {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
 }
 
 /* Form */
@@ -3170,7 +3264,7 @@ body::before {
   color: var(--text-primary);
   font-size: 0.95rem;
   font-weight: 500;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   transition: all 0.2s;
 }
 
@@ -3267,7 +3361,7 @@ body::before {
   justify-content: center;
   gap: 10px;
   transition: all 0.2s;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
   margin-top: 8px;
   position: relative;
@@ -3275,13 +3369,18 @@ body::before {
 }
 
 .auth-submit-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -3329,7 +3428,7 @@ body::before {
 }
 
 .auth-divider::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 0;
@@ -3393,7 +3492,7 @@ body::before {
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .user-card-btn:hover {
@@ -3446,7 +3545,7 @@ body::before {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .user-menu-item:hover {
@@ -3463,4 +3562,339 @@ body::before {
   height: 1px;
   background: var(--border);
   margin: 4px 0;
+}
+
+/*
+────────────────────────────────────
+WORKSPACES
+────────────────────────────────────
+*/
+
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.workspace-add-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: var(--gradient-yellow);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.workspace-add-btn:hover {
+  transform: scale(1.08);
+  opacity: 0.95;
+}
+
+.workspace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.workspace-block {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.workspace-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: white;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.workspace-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.workspace-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.workspace-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.18);
+  color: #c4b5fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.workspace-courses {
+  padding: 0 8px 10px 26px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/*
+────────────────────────────────────
+NAV COURSES
+────────────────────────────────────
+*/
+.nav-delete-btn {
+  opacity: 0;
+
+  border: none;
+  background: transparent;
+  color: #ef4444;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nav-delete-btn:hover {
+  transform: scale(1.15);
+}
+
+/*
+────────────────────────────────────
+EMPTY STATES
+────────────────────────────────────
+*/
+
+.nav-empty {
+  color: #71717a;
+  font-size: 13px;
+  padding: 8px 4px;
+}
+
+.nav-empty.small {
+  padding-left: 8px;
+}
+
+/*
+────────────────────────────────────
+MODAL
+────────────────────────────────────
+*/
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+
+  background: #111827;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 20px;
+
+  padding: 24px;
+
+  color: white;
+
+  animation: modalFade 0.25s ease;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.modal p {
+  margin-top: 10px;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+.modal-input {
+  width: 100%;
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.03);
+
+  color: white;
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.modal-input:focus {
+  border-color: #7c3aed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-actions {
+  margin-top: 24px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/*
+────────────────────────────────────
+RESPONSIVE
+────────────────────────────────────
+*/
+
+@media (max-width: 768px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    margin: 16px;
+  }
+
+  .workspace-toggle {
+    padding: 10px;
+  }
+
+  .workspace-courses {
+    padding-left: 18px;
+  }
+}
+
+/*
+────────────────────────────────────
+WORKSPACE DESCRIPTION
+────────────────────────────────────
+*/
+
+.workspace-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.workspace-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.workspace-description {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+
+  margin-top: 2px;
+
+  max-width: 180px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  line-height: 1.3;
+}
+
+/*
+────────────────────────────────────
+MODAL TEXTAREA
+────────────────────────────────────
+*/
+
+.modal-textarea {
+  width: 100%;
+
+  margin-top: 14px;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: white;
+
+  font-size: 14px;
+
+  resize: vertical;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.modal-textarea:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.modal-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.workspace-delete-btn {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workspace-block:hover .workspace-delete-btn {
+  opacity: 1;
+}
+
+.workspace-delete-btn:hover {
+  transform: scale(1.1);
 }
