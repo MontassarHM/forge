@@ -1,8 +1,6 @@
-
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, X, Loader, Zap, Sparkles, Clock, Target } from 'lucide-react';
+import { Upload, X, Loader, Zap, Sparkles, FolderOpen, Target } from 'lucide-react';
 import { generateCourseFromAI } from '../services/aiService';
 import { parseMultipleFiles } from '../services/fileParser';
 import { saveCourse, recordActivity } from '../services/statsService';
@@ -10,7 +8,7 @@ import { useApp } from '../context/AppContext';
 
 function UploadCourse() {
   const navigate = useNavigate();
-  const { refreshCourses, refreshStats } = useApp();
+  const {refreshCourses, refreshStats, workspaces} = useApp();
   const [files, setFiles] = useState([]);
   const [duration, setDuration] = useState(60);
   const [difficulty, setDifficulty] = useState('medium');
@@ -19,6 +17,7 @@ function UploadCourse() {
   const [progressDetail, setProgressDetail] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [specification, setSpecification] = useState('');
+  const [selectedWorkspace, setSelectedWorkspace] = useState('');
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files);
@@ -62,7 +61,18 @@ function UploadCourse() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (files.length === 0) return alert('Please upload at least one document');
+
+    if (files.length === 0) {
+      return alert(
+        'Please upload at least one document'
+      );
+    }
+
+    if (!selectedWorkspace) {
+      return alert(
+        'Please select a workspace'
+      );
+    }
 
     setLoading(true);
     try {
@@ -82,6 +92,7 @@ function UploadCourse() {
         content,
         duration,
         difficulty,
+        specification
       });
 
       setProgress('Finalizing');
@@ -92,7 +103,12 @@ function UploadCourse() {
         id: `course_${Date.now()}`,
         difficulty,
         duration,
-        sourceFiles: files.map(f => f.name)
+        specification,
+        workspaceId:
+          selectedWorkspace,
+
+        sourceFiles:
+          files.map(f => f.name)
       };
 
       saveCourse(course);
@@ -204,24 +220,42 @@ function UploadCourse() {
           </div>
 
           <div className="config-grid">
-            {/* Duration */}
             <div className="config-card">
               <div className="config-card-header">
-                <Clock size={18} />
-                <span>Total Duration</span>
-              </div>
-              <input
-                type="number"
-                value={duration}
-                onChange={e => setDuration(e.target.value)}
-                min="10"
-                max="480"
-                className="config-input"
-                disabled={loading}
-              />
-              <p className="config-hint">{duration} minutes</p>
-            </div>
 
+                <FolderOpen size={18} />
+
+                <span>Workspace</span>
+              </div>
+              <select
+                className="config-input"
+                value={selectedWorkspace}
+                onChange={(e) =>
+                  setSelectedWorkspace(
+                    e.target.value
+                  )
+                }
+                disabled={loading}
+              >
+
+                <option value="">
+                  Select workspace
+                </option>
+
+                {workspaces.map(ws => (
+
+                  <option
+                    key={ws.id}
+                    value={ws.id}
+                  >
+                    {ws.name}
+                  </option>
+
+                ))}
+
+              </select>
+
+            </div>
             {/* Difficulty */}
             <div className="config-card">
               <div className="config-card-header">
